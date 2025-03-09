@@ -1,0 +1,66 @@
+
+[local]
+copy_config  = true
+config_title = ".dev.toml"
+
+[repository]
+git_username = ""
+git_hostname = "github.com"
+git_ssh      = false
+git_commit   = "init: project"
+
+
+#- C/C++ Config ----------------------------------------------------------------
+
+[dev.cxx]
+extensions  = { "c", "cpp", "h" }
+cd_root     = true
+build       = "cmake -S . -B build && cmake --build build"
+run         = "cmake -S . -B build && cmake --build build; ./bin"
+clean       = "rm -rf build/*"
+debug       = "lldb"
+
+
+[init.c]
+command     = "ln -s './build/src/%PROJECT' './bin'"
+license     = "Apache2"
+directories = { "src", "include", "build", "lib" }
+templates   = [
+    { title = "c_main.c",  destination = "src/main.c" },
+    { title = "c_debug.h", destination = "include/debug.h" },
+]
+git_ignore  = { "**/.DS_Store", "**/todo", ".cache/", "build/", "obj/" }
+git_init    = true
+
+
+[init.cpp]
+command     = "ln -s './build/src/%PROJECT' './bin'"
+license     = "Apache2"
+directories = { "src", "include", "build", "lib" }
+templates   = [
+    { title = "main.cpp",  destination = "src/main.cpp" },
+    { title = "cpp_debug.h", destination = "include/debug.h" },
+]
+git_ignore  = { "**/.DS_Store", "**/todo", ".cache/", "build/", "obj/" }
+git_init    = true
+
+
+#- Python Config ---------------------------------------------------------------
+
+[dev.python]
+extensions  = { "py" }
+cd_root     = true
+run         = "py main.py"
+test        = "py test.py"
+clean       = "rm -rf __pycache__/"
+
+[init.python]
+command     = "python -m venv ./.pyenv; source ./.pyenv/bin/activate"
+license     = "MIT"
+files       = "requirements.txt"
+templates   = [
+    { title = "py_main.py",  destination = "main.py" },
+]
+git_ignore  = { "**/.DS_Store", "**/todo", ".pyenv/", "__pycache__/" }
+git_init    = true
+
