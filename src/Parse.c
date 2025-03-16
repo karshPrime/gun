@@ -24,4 +24,3 @@ uint parse_input_count( uint aIndex, const uint aLen, char * aArg[] )
     return Result + aIndex + 1;
 }
 
-

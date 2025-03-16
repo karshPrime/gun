@@ -4,37 +4,39 @@ $ dev init [ProjectName] [Language]
     --license                           State what license to use
     --no-git                            Not initialise as git repository
     --git-ignore [Args]                 Add args to existing git ignore list
-    --git-ignore-only                   Create git ignore list only with these args
+    --git-ignore-only [Args]            Create git ignore list only with these args
     --template [Title] [Destination]    Add template code to current project, in addition to default config
     --ignore-template                   Dont add any or all template to the project
 
 $ dev template
-    --list                  List all template files
-    --print-dir             Print the location of where the templates are stored
-    --new [Title]           Create new template file with the given title
+    --list                              List all template files
+    --print-dir                         Print the location of where the templates are stored
+    --add [Title] [Destination]         Add more template code to current project
+    --new [Title]                       Create new template file with the given title
 
 $ dev license
-    --list                  List all saved licenses
-    --print-dir             Print the location of where the licenses are stored
-    --new [Title]           Create new license file with the given title
+    --list                              List all saved licenses
+    --print-dir                         Print the location of where the licenses are stored
+    --replace [Title]                   Replace the current license with new one
+    --new [Title]                       Create new license file with the given title
 
-$ dev run {Args}            Run the program with passed optional arguments
+$ dev run {Args}                        Run the program with passed optional arguments
 
-$ dev build {Flags}         Build the program with passed optional flags
+$ dev build {Flags}                     Build the program with passed optional flags
 
-$ dev bun                   Build the program and then run it.
-    --flags [Flags]         Specify optional build flags
-    --args  [Args]          Specify optional run arguments
+$ dev bun                               Build the program and then run it.
+    --flags [Flags]                     Specify optional build flags
+    --args  [Args]                      Specify optional run arguments
 
-$ dev clean                 Clean the build files
+$ dev clean                             Clean the build files
 
-$ dev debug                 Run project specific debugger
+$ dev debug                             Run project specific debugger
 
-$ dev test                  Run the test files
+$ dev test                              Run the test files
 
-$ dev help                  Print this help menu
+$ dev help                              Print this help menu
 
-$ dev version               Print utility version
+$ dev version                           Print utility version
 
 $ dev config
-    --local                 Edit (if existing or create) local config file
+    --local                             Edit (if existing or create) local config file
