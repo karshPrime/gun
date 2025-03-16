@@ -1,6 +1,7 @@
 
 add_executable( ${PROJECT_NAME}
     main.c
+    Commands.c
     Config.c
     Parse.c
     Print.c
