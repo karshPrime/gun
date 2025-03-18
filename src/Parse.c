@@ -4,9 +4,9 @@
 
 //--------------------------------------------------------------------------------------------------
 
-bool parse_check_value( const char *aArg, const char *aFull, const char *aShort )
+bool parse_check_value( const char *aArg, const char *aFull, const char aShort )
 {
-    return strcmp( &aArg[2], aFull ) == 0 || strcmp( &aArg[1], aShort ) == 0;
+    return strcmp( aArg, aFull ) == 0 || (*aArg == aShort && aArg[1] == '\0');
 }
 
 uint parse_input_count( uint aIndex, const uint aLen, char * aArg[] )
