@@ -22,34 +22,34 @@ int main( int argc, char *argv[] )
     const char *COMMAND = argv[1];
     Configs *lConfigs = configs_parse();
 
-
-    if ( parse_check_value( COMMAND, "bun", "x" ) )
+    if ( parse_check_value( COMMAND, "bun", 'b' ) )
     {
+        debug( "called bun" );
         char *lFlags[1]; // size 1 is temporal
         char *lArgs[1];
 
         action_bun( lArgs, lFlags );
     }
 
-    else if ( parse_check_value( COMMAND, "run", "r" ) )
+    else if ( parse_check_value( COMMAND, "run", 'r' ) )
     {
         char *lArgs[1];
 
         action_run( lArgs );
     }
 
-    else if ( parse_check_value( COMMAND, "build", "b" ) )
+    else if ( parse_check_value( COMMAND, "compile", 'c' ) )
     {
         char *lFlags[1];
 
         action_run( lFlags );
     }
 
-    else if ( parse_check_value( COMMAND, "debug",  "d" ) ) { action_debug(); }
-    else if ( parse_check_value( COMMAND, "test",   "t" ) ) { action_test();  }
-    else if ( parse_check_value( COMMAND, "clean",  "c" ) ) { action_clean(); }
+    else if ( parse_check_value( COMMAND, "debug",  'd' ) ) { action_debug(); }
+    else if ( parse_check_value( COMMAND, "test",   't' ) ) { action_test();  }
+    else if ( parse_check_value( COMMAND, "clean",  'x' ) ) { action_clean(); }
 
-    else if ( parse_check_value( COMMAND, "init", "i" ) )
+    else if ( parse_check_value( COMMAND, "init", 'i' ) )
     {
         InitArgs lInitArgs = {
             .Here = false,
@@ -62,7 +62,7 @@ int main( int argc, char *argv[] )
         cmd_init( lConfigs, lInitArgs );
     }
 
-    else if ( parse_check_value( COMMAND, "license", "l" ) )
+    else if ( parse_check_value( COMMAND, "license", 'l' ) )
     {
         RecordsArgs lRecords;
         char *lName;
@@ -70,7 +70,7 @@ int main( int argc, char *argv[] )
         cmd_license( lConfigs, lRecords, lName );
     }
 
-    else if ( parse_check_value( COMMAND, "tempalte", "tm" ) )
+    else if ( parse_check_value( COMMAND, "tempalte", 'T' ) )
     {
         RecordsArgs lRecords;
         Move *lMove;
@@ -78,7 +78,7 @@ int main( int argc, char *argv[] )
         cmd_template( lConfigs, lRecords, lMove );
     }
 
-    else if ( parse_check_value( COMMAND, "config", "z" ) )
+    else if ( parse_check_value( COMMAND, "config", 'z' ) )
     {
         bool lIsLocal = false;
 
