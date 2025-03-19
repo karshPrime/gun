@@ -8,14 +8,14 @@
 #include "Parse.h"
 #include "Print.h"
 
-const char *VERSION = "0.0.1";
+const char *CURRENT_VERSION = "0.0.1";
 
 int main( int argc, char *argv[] )
 {
     if ( argc < 2 )
     {
         log_error( "Missing Arguments" );
-        print_usage();
+        print_usage( INIT );
         return 1;
     }
 
@@ -85,13 +85,13 @@ int main( int argc, char *argv[] )
         action_config( lIsLocal );
     }
 
-    else if ( parse_check_value( COMMAND, "help",    "h" ) ) { print_help();    }
-    else if ( parse_check_value( COMMAND, "version", "v" ) ) { print_version(); }
+    else if ( parse_check_value( COMMAND, "help",    'h' ) ) { print_help( NONE ); }
+    else if ( parse_check_value( COMMAND, "version", 'v' ) ) { print_version();    }
 
     else
     {
         log_error( "Invalid Argument." );
-        print_usage();
+        print_usage( NONE );
     }
 
     return 0;

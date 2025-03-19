@@ -3,9 +3,13 @@
 
 #include <stdio.h>
 
-void print_help( void );
-void print_usage( void );
+typedef enum {
+    NONE, RUN, BUN, INIT, TEMPLATE, TEST, DEBUG, LICENSE, CONFIG, HELP, VERSION, COMPILE, CLEAN
+} Commands;
+
+void print_help( Commands );
+void print_usage( Commands );
 void print_version( void );
 
-extern const char *VERSION;
+extern const char *CURRENT_VERSION;
 
