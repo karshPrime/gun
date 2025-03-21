@@ -1,4 +1,5 @@
 
+
 $ dev init [ProjectName] [Language]
     --here                              Create project in current directory, instead of mkdir
     --license                           State what license to use
@@ -21,18 +22,24 @@ $ dev license
     --new [Title]                       Create new license file with the given title
 
 $ dev run {Args}                        Run the program with passed optional arguments
+    --global                            Run the program with globally defined config, override local config
 
 $ dev build {Flags}                     Build the program with passed optional flags
+    --global                            Build the program with globally defined config, override local config
 
 $ dev bun                               Build the program and then run it.
     --flags [Flags]                     Specify optional build flags
     --args  [Args]                      Specify optional run arguments
+    --global                            Build and Run the program with globally defined config, override local config
 
 $ dev clean                             Clean the build files
+    --global                            Clean the program with globally defined config, override local config
 
 $ dev debug                             Run project specific debugger
+    --global                            Run the debugger defined in the with global config, override local config
 
 $ dev test                              Run the test files
+    --global                            Run the test defined in the with global config, override local config
 
 $ dev help                              Print this help menu
 
