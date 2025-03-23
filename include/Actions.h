@@ -3,11 +3,11 @@
 
 #include "Config.h"
 
-void action_bun( char *[], char *[] );
-void action_run( char *[] );
-void action_build( char *[] );
-void action_clean( void );
-void action_debug( void );
-void action_test( void );
+void action_bun( Configs *, char *[], char *[] );
+void action_run( Configs *, char *[] );
+void action_test( Configs * );
+void action_clean( Configs * );
+void action_debug( Configs * );
 void action_config( bool );
+void action_compile( Configs *, char *[] );
 

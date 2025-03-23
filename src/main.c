@@ -8,6 +8,8 @@
 #include "Parse.h"
 #include "Print.h"
 
+#include <string.h>
+
 const char *CURRENT_VERSION = "0.0.1";
 
 int main( int argc, char *argv[] )
@@ -19,35 +21,111 @@ int main( int argc, char *argv[] )
         return 1;
     }
 
-    const char *COMMAND = argv[1];
-    Configs *lConfigs = configs_parse();
+    Configs *lConfigs = NULL;
+    ConfigDomain lDomain = LOCAL;
+    const char  *COMMAND = argv[1];
 
     if ( parse_check_value( COMMAND, "bun", 'b' ) )
     {
-        debug( "called bun" );
-        char *lFlags[1]; // size 1 is temporal
-        char *lArgs[1];
+        int   lArgsIndex  = 0;
+        int   lFlagsIndex = 0;
+        bool  lFlagsFound = false;
+        char *lArgs[argc];
+        char *lFlags[argc];
 
-        action_bun( lArgs, lFlags );
+        for ( int i = 2; i < argc; i++ )
+        {
+            if ( strcmp( argv[i], "--args" ) == 0 )
+            {
+                lFlagsFound = false;
+            }
+            else if ( strcmp( argv[i], "--flags" ) == 0 )
+            {
+                lFlagsFound = true;
+            }
+            else if ( strcmp( argv[i], "--global" ) == 0 )
+            {
+                lDomain = GLOBAL;
+            }
+            else if ( lFlagsFound )
+            {
+                lFlags[lFlagsIndex++] = argv[i];
+            }
+            else
+            {
+                lArgs[lArgsIndex++] = argv[i];
+            }
+        }
+
+        lConfigs = configs_parse( lDomain );
+        action_bun( lConfigs, lArgs, lFlags );
     }
 
     else if ( parse_check_value( COMMAND, "run", 'r' ) )
     {
-        char *lArgs[1];
+        char *lArgs[argc];
+        int lArgsIndex = 0;
 
-        action_run( lArgs );
+        for ( int i = 2; i < argc; i++ )
+        {
+            if ( strcmp( argv[i], "--global" ) == 0 )
+            {
+                lDomain = GLOBAL;
+            }
+            else
+            {
+                lArgs[lArgsIndex++] = argv[i];
+            }
+        }
+
+        lConfigs = configs_parse( lDomain );
+        action_run( lConfigs, lArgs );
     }
 
     else if ( parse_check_value( COMMAND, "compile", 'c' ) )
     {
-        char *lFlags[1];
+        char *lFlags[argc];
+        int lFlagsIndex = 0;
 
-        action_run( lFlags );
+        for ( int i = 2; i < argc; i++ )
+        {
+            if ( strcmp( argv[i], "--global" ) == 0 )
+            {
+                lDomain = GLOBAL;
+            }
+            else
+            {
+                lFlags[lFlagsIndex++] = argv[i];
+            }
+        }
+
+        lConfigs = configs_parse( lDomain );
+        action_compile( lConfigs, lFlags );
     }
 
-    else if ( parse_check_value( COMMAND, "debug",  'd' ) ) { action_debug(); }
-    else if ( parse_check_value( COMMAND, "test",   't' ) ) { action_test();  }
-    else if ( parse_check_value( COMMAND, "clean",  'x' ) ) { action_clean(); }
+    else if ( parse_check_value( COMMAND, "debug", 'd' ) )
+    {
+        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+
+        lConfigs = configs_parse( lDomain );
+        action_debug( lConfigs );
+    }
+
+    else if ( parse_check_value( COMMAND, "test", 't' ) )
+    {
+        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+
+        lConfigs = configs_parse( lDomain );
+        action_test(  lConfigs );
+    }
+
+    else if ( parse_check_value( COMMAND, "clean", 'x' ) )
+    {
+        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+
+        lConfigs = configs_parse( lDomain );
+        action_clean( lConfigs );
+    }
 
     else if ( parse_check_value( COMMAND, "init", 'i' ) )
     {
@@ -57,8 +135,62 @@ int main( int argc, char *argv[] )
             .TemplateIgnore = false
         };
 
-        // parse remaining flags
+        for ( int i = 2; i < argc; i++ )
+        {
+            if ( strcmp( argv[i], "--here" ) == 0 )
+            {
+                lInitArgs.Here = true;
+            }
+            else if ( i+1 < argc && strcmp( argv[i], "--license" ) == 0 )
+            {
+                lInitArgs.License = argv[i+1];
+            }
+            else if ( strcmp( argv[i], "--no-git" ) == 0 )
+            {
+                lInitArgs.NoGit = true;
+            }
+            else if ( i+1 < argc && strcmp( argv[i], "--git-ignore" ) == 0 )
+            {
+                const int lStartIndex = i;
+                char *lArgs[argc-lStartIndex];
 
+                while ( argv[i][0] != '-' )
+                {
+                    lArgs[i-lStartIndex] = argv[i];
+                    i++;
+                }
+
+                lInitArgs.GitIgnore = lArgs;
+            }
+            else if ( i+1 < argc && strcmp( argv[i], "--git-ignore-only" ) == 0 )
+            {
+                const int lStartIndex = i;
+                char *lArgs[argc-lStartIndex];
+
+                while ( argv[i][0] != '-' )
+                {
+                    lArgs[i-lStartIndex] = argv[i];
+                    i++;
+                }
+
+                lInitArgs.GitOnlyIgnore = lArgs;
+            }
+            else if ( i+1 < argc && strcmp( argv[i], "--template" ) == 0 )
+            {
+                const int lStartIndex = i;
+                char *lArgs[argc-lStartIndex];
+
+                while ( argv[i][0] != '-' )
+                {
+                    lArgs[i-lStartIndex] = argv[i];
+                    i++;
+                }
+
+                lInitArgs.Templates = lArgs;
+            }
+        }
+
+        lConfigs = configs_parse( lDomain );
         cmd_init( lConfigs, lInitArgs );
     }
 
@@ -67,32 +199,92 @@ int main( int argc, char *argv[] )
         RecordsArgs lRecords;
         char *lName;
 
+        lConfigs = configs_parse( lDomain );
+
+        if ( argc <=  2 )
+        {}
+        else if ( strcmp( argv[2], "--lists" ) == 0 )
+        {
+            lRecords.Lists = true;
+        }
+        else if ( 3 < argc && strcmp( argv[2], "--new" ) == 0 )
+        {
+            lRecords.New = argv[3];
+        }
+        else if ( 3 < argc && strcmp( argv[2], "--replace" ) == 0 )
+        {
+            lName = argv[3];
+        }
+        else if ( strcmp( argv[2], "--print-dir" ) == 0 )
+        {
+            lRecords.PrintDir = true;
+        }
+
         cmd_license( lConfigs, lRecords, lName );
     }
 
-    else if ( parse_check_value( COMMAND, "tempalte", 'T' ) )
+    else if ( parse_check_value( COMMAND, "template", 'T' ) )
     {
         RecordsArgs lRecords;
-        Move *lMove;
+        char *lTemplates[argc];
 
-        cmd_template( lConfigs, lRecords, lMove );
+        bool lManage = false;
+        lConfigs = configs_parse( lDomain );
+
+
+        if ( argc <=  2 )
+        { }
+        else if ( strcmp( argv[2], "--lists" ) == 0 )
+        {
+            lRecords.Lists = true;
+        }
+        else if ( 3 < argc && strcmp( argv[2], "--new" ) == 0 )
+        {
+            lRecords.New = argv[3];
+        }
+        else if ( 3 < argc && strcmp( argv[2], "--add" ) == 0 )
+        {
+            for ( int i = 3; i < argc; i++ )
+            {
+                lTemplates[i-3] = argv[i];
+            }
+        }
+        else if ( strcmp( argv[2], "--manage" ) == 0 )
+        {
+            lManage = true;
+        }
+        else if ( strcmp( argv[2], "--print-dir" ) == 0 )
+        {
+            lRecords.PrintDir = true;
+        }
+
+        cmd_template( lConfigs, lRecords, lTemplates, lManage );
     }
 
     else if ( parse_check_value( COMMAND, "config", 'z' ) )
     {
-        bool lIsLocal = false;
+        bool lIsLocal = ( 2 < argc && strcmp( argv[2], "--local" ) == 0 );
 
         action_config( lIsLocal );
     }
 
-    else if ( parse_check_value( COMMAND, "help",    'h' ) ) { print_help( NONE ); }
-    else if ( parse_check_value( COMMAND, "version", 'v' ) ) { print_version();    }
+    else if ( parse_check_value( COMMAND, "help", 'h' ) )
+    {
+        print_help( NONE );
+    }
+
+    else if ( parse_check_value( COMMAND, "version", 'v' ) )
+    {
+        print_version();
+    }
 
     else
     {
         log_error( "Invalid Argument." );
         print_usage( NONE );
     }
+
+    configs_free( lConfigs );
 
     return 0;
 }

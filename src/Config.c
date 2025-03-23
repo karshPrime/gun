@@ -2,7 +2,7 @@
 #include "Config.h"
 #include <stdlib.h>
 
-Configs *configs_parse( void )
+Configs *configs_parse( ConfigDomain aDomain )
 {
     Configs *Result = malloc( sizeof( Configs ) );
 

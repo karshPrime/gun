@@ -6,24 +6,19 @@
 //- Custom Datatypes -------------------------------------------------------------------------------
 
 typedef struct {
-    char   *Title;
-    char   *Destination;
-} Move;
-
-typedef struct {
     bool    Here;
     bool    NoGit;
     char   *License;
-    char   *GitIgnore;
-    char   *GitOnlyIgnore;
-    Move   *Templates;
+    char  **GitIgnore;
+    char  **GitOnlyIgnore;
+    char  **Templates;
     bool    TemplateIgnore;
 } InitArgs;
 
 typedef struct {
     bool    Lists;
     bool    PrintDir;
-    char   *Title;
+    char   *New;
 } RecordsArgs;
 
 
@@ -31,5 +26,5 @@ typedef struct {
 
 void cmd_init( Configs *, InitArgs );
 void cmd_license( Configs *, RecordsArgs, char * );
-void cmd_template( Configs *, RecordsArgs, Move * );
+void cmd_template( Configs *, RecordsArgs, char **, bool );
 

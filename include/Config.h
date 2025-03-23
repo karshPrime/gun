@@ -9,6 +9,7 @@
 //- Custom Datatypes -------------------------------------------------------------------------------
 
 typedef enum { false, true } bool;
+typedef enum { LOCAL, GLOBAL } ConfigDomain;
 typedef unsigned int uint;
 
 typedef struct {
@@ -56,7 +57,7 @@ typedef struct {
 
 //- Declarations -----------------------------------------------------------------------------------
 
-Configs *configs_parse( void );
+Configs *configs_parse( ConfigDomain );
 void configs_free( Configs * );
 
 ConfigDev *configs_dev( Configs * );

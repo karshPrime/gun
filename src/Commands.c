@@ -11,7 +11,7 @@ void cmd_license( Configs *aConfigs, RecordsArgs aArgs, char *aReplaceTitle )
     //
 }
 
-void cmd_template( Configs *aConfigs, RecordsArgs aArgs, Move *aFiles )
+void cmd_template( Configs *aConfigs, RecordsArgs aArgs, char **aTemplates, bool aManage )
 {
     //
 }

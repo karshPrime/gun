@@ -1,32 +1,32 @@
 
 #include "Actions.h"
 
-void action_bun( char *aArgs[], char *aFlags[] )
+void action_bun( Configs *aConfig, char *aArgs[], char *aFlags[] )
 {
     //
 }
 
-void action_run( char *aArgs[] )
+void action_run( Configs *aConfig, char *aArgs[] )
 {
     //
 }
 
-void action_build( char *aFlags[] )
+void action_compile( Configs *aConfig, char *aFlags[] )
 {
     //
 }
 
-void action_clean( void )
+void action_clean( Configs *aConfig )
 {
     //
 }
 
-void action_debug( void )
+void action_debug( Configs *aConfig )
 {
     //
 }
 
-void action_test( void )
+void action_test( Configs *aConfig )
 {
     //
 }
