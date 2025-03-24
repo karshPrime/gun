@@ -13,8 +13,12 @@ Configs *configs_parse( ConfigDomain aDomain )
 
 void configs_free( Configs *aConfigs )
 {
-    free( aConfigs );
     debug( "configs_free() called" );
+
+    if ( aConfigs )
+    {
+        free( aConfigs );
+    }
 }
 
 ConfigDev *configs_dev( Configs *aConfigs )
