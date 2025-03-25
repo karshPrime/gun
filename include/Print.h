@@ -8,7 +8,6 @@ typedef enum {
 } Commands;
 
 void print_help( Commands );
-void print_usage( Commands );
 void print_version( void );
 
 extern const char *CURRENT_VERSION;

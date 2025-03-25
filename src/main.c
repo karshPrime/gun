@@ -17,7 +17,7 @@ int main( int argc, char *argv[] )
     if ( argc < 2 )
     {
         log_error( "Missing Arguments" );
-        print_usage( INIT );
+        print_help( NONE );
         return 1;
     }
 
@@ -202,7 +202,7 @@ int main( int argc, char *argv[] )
         lConfigs = configs_parse( lDomain );
 
         if ( argc <=  2 )
-        {}
+        { }
         else if ( strcmp( argv[2], "--lists" ) == 0 )
         {
             lRecords.Lists = true;
@@ -270,7 +270,24 @@ int main( int argc, char *argv[] )
 
     else if ( parse_check_value( COMMAND, "help", 'h' ) )
     {
-        print_help( NONE );
+        if ( argc < 3 ) print_help( NONE );
+        else if ( strcmp( argv[2], "run" ) == 0 ) print_help( RUN );
+        else if ( strcmp( argv[2], "bun" ) == 0 ) print_help( BUN );
+        else if ( strcmp( argv[2], "init" ) == 0 ) print_help( INIT );
+        else if ( strcmp( argv[2], "help" ) == 0 ) print_help( HELP );
+        else if ( strcmp( argv[2], "test" ) == 0 ) print_help( TEST );
+        else if ( strcmp( argv[2], "clean" ) == 0 ) print_help( CLEAN );
+        else if ( strcmp( argv[2], "debug" ) == 0 ) print_help( DEBUG );
+        else if ( strcmp( argv[2], "config" ) == 0 ) print_help( CONFIG );
+        else if ( strcmp( argv[2], "license" ) == 0 ) print_help( LICENSE );
+        else if ( strcmp( argv[2], "version" ) == 0 ) print_help( VERSION );
+        else if ( strcmp( argv[2], "compile" ) == 0 ) print_help( COMPILE );
+        else if ( strcmp( argv[2], "template" ) == 0 ) print_help( TEMPLATE );
+        else
+        {
+            log_error( "Invalid Option %s", argv[2] );
+            print_help( NONE );
+        }
     }
 
     else if ( parse_check_value( COMMAND, "version", 'v' ) )
@@ -281,7 +298,7 @@ int main( int argc, char *argv[] )
     else
     {
         log_error( "Invalid Argument." );
-        print_usage( NONE );
+        print_help( NONE );
     }
 
     configs_free( lConfigs );

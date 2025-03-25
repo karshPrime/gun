@@ -28,11 +28,6 @@ void print_help( Commands aSpecific )
 {
     debug( "print help" );
 
-    print_usage( aSpecific );
-}
-
-void print_usage( Commands aSpecific )
-{
     switch ( aSpecific )
     {
         case NONE:
@@ -51,11 +46,10 @@ void print_usage( Commands aSpecific )
             break;
 
         case BUN:
-            print_command( "bun", "{Args}", "Build and run programme" );
+            print_command( "bun", "", "Build and run programme" );
             printf( "\nFLAGS:\n" );
             print_description( "flags [Flags]", "Specify build flags" );
             print_description( "args [Args]", "Specify run args" );
-            print_description( "global", "Use global config, overriding local" );
             print_description( "global", "Override local config with global settings" );
             break;
 
@@ -63,11 +57,11 @@ void print_usage( Commands aSpecific )
             print_command( "init", "[ProjectName] [Language]", "Initialise a new project." );
             printf( "\nFLAGS:\n" );
             print_description( "here", "Create project in current directory" );
-            print_description( "licence", "Specify licence to use" );
+            print_description( "licence [Title]", "Specify licence to use" );
             print_description( "no-git", "Omit Git initialisation" );
             print_description( "git-ignore [Args]", "Add to Git ignore list" );
             print_description( "git-ignore-only [Args]", "Create Git ignore list with specified args" );
-            print_description( "template [Title] [Destination]", "Add template code to project" );
+            print_description( "template [Templates]", "Add template code to project" );
             print_description( "ignore-template", "Omit template code" );
             break;
 
@@ -75,9 +69,10 @@ void print_usage( Commands aSpecific )
             print_command( "template", "{Args}", "Manage template files for projects." );
             printf( "\nFLAGS:\n" );
             print_description( "list", "List available templates" );
-            print_description( "print-dir", "Show template directory" );
-            print_description( "add [Title] [Destination]", "Add template code to project" );
+            print_description( "add [Templates]", "Add template code to project" );
             print_description( "new [Title]", "Create new template file" );
+            print_description( "manage", "Manage the record of all saved templates" );
+            print_description( "print-dir", "Show template directory" );
             break;
 
         case CLEAN:
@@ -102,9 +97,9 @@ void print_usage( Commands aSpecific )
             print_command( "licence", "{Args}", "Manage licences for projects." );
             printf( "\nFLAGS:\n" );
             print_description( "list", "List available licences" );
-            print_description( "print-dir", "Show licence directory" );
             print_description( "replace [Title]", "Replace current licence" );
             print_description( "new [Title]", "Create new licence file" );
+            print_description( "print-dir", "Show licence directory" );
             break;
 
         case CONFIG:
