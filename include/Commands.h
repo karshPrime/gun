@@ -6,6 +6,8 @@
 //- Custom Datatypes -------------------------------------------------------------------------------
 
 typedef struct {
+    char   *ProjectName;
+    char   *Language;
     bool    Here;
     bool    NoGit;
     char   *License;

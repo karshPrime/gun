@@ -22,14 +22,14 @@ int main( int argc, char *argv[] )
     }
 
     Configs *lConfigs = NULL;
+    const char *COMMAND = argv[1];
     ConfigDomain lDomain = LOCAL;
-    const char  *COMMAND = argv[1];
 
     if ( parse_check_value( COMMAND, "bun", 'b' ) )
     {
-        int   lArgsIndex  = 0;
-        int   lFlagsIndex = 0;
-        bool  lFlagsFound = false;
+        int  lArgsIndex  = 0;
+        int  lFlagsIndex = 0;
+        bool lFlagsFound = false;
         char *lArgs[argc];
         char *lFlags[argc];
 
@@ -129,13 +129,23 @@ int main( int argc, char *argv[] )
 
     else if ( parse_check_value( COMMAND, "init", 'i' ) )
     {
+        if ( argc < 4 )
+        {
+            log_error( "Missing Project description" );
+            print_help( INIT );
+
+            goto AfterArgumentCheck;
+        }
+
         InitArgs lInitArgs = {
+            .ProjectName = argv[2],
+            .Language = argv[3],
             .Here = false,
             .NoGit = false,
             .TemplateIgnore = false
         };
 
-        for ( int i = 2; i < argc; i++ )
+        for ( int i = 4; i < argc; i++ )
         {
             if ( strcmp( argv[i], "--here" ) == 0 )
             {
@@ -301,6 +311,7 @@ int main( int argc, char *argv[] )
         print_help( NONE );
     }
 
+AfterArgumentCheck:
     configs_free( lConfigs );
 
     return 0;
