@@ -13,28 +13,21 @@ typedef enum { LOCAL, GLOBAL } ConfigDomain;
 typedef unsigned int uint;
 
 typedef struct {
-    bool        Copy;
-    char       *Title;
-} ConfigLocal;
-
-typedef struct {
-    char       *Username;
-    char       *Hostname;
-    bool        SSH;
-    bool        Commit;
-} ConfigRepo;
-
-typedef struct {
+    bool        CopyConfigLocal;
     bool        GitInit;
+    char       *Title;
+    char       *Command;
+    char       *License;
     char      **GitIgnore;
     char      **Directories;
     char      **Files;
-    char       *Command;
-    char       *License;
+    char      **Templates;
     struct {
-        char   *Title;
-        char   *Destination;
-    } *Templates;
+        char   *Username;
+        char   *Hostname;
+        bool    SSH;
+        bool    Commit;
+    } ConfigRepo;
 } ConfigInit;
 
 typedef struct {
