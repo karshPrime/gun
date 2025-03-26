@@ -6,7 +6,7 @@
 
 void print_description( const char *aFlag, const char *aDescription )
 {
-    printf( "%s    --%-31s %s%s%s\n",
+    printf( "%s    --%-22s %s%s%s\n",
             TERM_GREEN, aFlag, TERM_GRAY, aDescription, TERM_RESET );
 }
 

@@ -6,6 +6,17 @@
 
 #pragma once
 
+//- Environment Variables --------------------------------------------------------------------------
+
+#if defined(_WIN32) && defined(_WIN64)
+    #define CONFIG_DIR ""
+
+#else // macOS or Linux
+    #define CONFIG_DIR "~/.config/devconfig"
+
+#endif
+
+
 //- Custom Datatypes -------------------------------------------------------------------------------
 
 typedef enum { false, true } bool;
