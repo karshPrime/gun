@@ -1,6 +1,17 @@
 
+/* Commands.c
+ *
+ *
+ */
+
 #include "Commands.h"
 #include "Debug.h"
+
+//- Helper Functions -------------------------------------------------------------------------------
+
+
+
+//- External Calls ---------------------------------------------------------------------------------
 
 void cmd_init( bool aLocalConfig, InitArgs aArgs )
 {
