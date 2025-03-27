@@ -51,18 +51,14 @@ typedef struct {
     bool        RootCD;
 } ConfigDev;
 
-typedef struct {
-    ConfigLocal Local;
-    ConfigRepo  Repository;
-    ConfigInit *Init;
-    ConfigDev  *Dev;
-} Configs;
-
 
 //- Declarations -----------------------------------------------------------------------------------
 
-Configs *configs_parse( ConfigDomain );
-void configs_free( Configs * );
+ConfigInit *config_parse_init( void );
+char **config_parse_template( void );
+ConfigDev *config_parse_dev( bool );
 
-ConfigDev *configs_dev( Configs * );
+void config_free_init( ConfigInit * );
+void config_free_template( char ** );
+void config_free_dev( ConfigDev * );
 

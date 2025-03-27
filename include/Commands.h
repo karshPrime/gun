@@ -26,7 +26,7 @@ typedef struct {
 
 //- Declarations -----------------------------------------------------------------------------------
 
-void cmd_init( Configs *, InitArgs );
-void cmd_license( Configs *, RecordsArgs, char * );
-void cmd_template( Configs *, RecordsArgs, char **, bool );
+void cmd_init( bool, InitArgs );
+void cmd_license( RecordsArgs, char * );
+void cmd_template( RecordsArgs, char **, bool );
 

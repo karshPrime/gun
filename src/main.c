@@ -3,7 +3,6 @@
 
 #include "Actions.h"
 #include "Commands.h"
-#include "Config.h"
 #include "Debug.h"
 #include "Parse.h"
 #include "Print.h"
@@ -21,9 +20,8 @@ int main( int argc, char *argv[] )
         return 1;
     }
 
-    Configs *lConfigs = NULL;
     const char *COMMAND = argv[1];
-    ConfigDomain lDomain = LOCAL;
+    bool lLocalConfig = true;
 
     if ( parse_check_value( COMMAND, "bun", 'b' ) )
     {
@@ -45,7 +43,7 @@ int main( int argc, char *argv[] )
             }
             else if ( strcmp( argv[i], "--global" ) == 0 )
             {
-                lDomain = GLOBAL;
+                lLocalConfig = false;
             }
             else if ( lFlagsFound )
             {
@@ -57,8 +55,7 @@ int main( int argc, char *argv[] )
             }
         }
 
-        lConfigs = configs_parse( lDomain );
-        action_bun( lConfigs, lArgs, lFlags );
+        action_bun( lLocalConfig, lArgs, lFlags );
     }
 
     else if ( parse_check_value( COMMAND, "run", 'r' ) )
@@ -70,7 +67,7 @@ int main( int argc, char *argv[] )
         {
             if ( strcmp( argv[i], "--global" ) == 0 )
             {
-                lDomain = GLOBAL;
+                lLocalConfig = false;
             }
             else
             {
@@ -78,8 +75,7 @@ int main( int argc, char *argv[] )
             }
         }
 
-        lConfigs = configs_parse( lDomain );
-        action_run( lConfigs, lArgs );
+        action_run( lLocalConfig, lArgs );
     }
 
     else if ( parse_check_value( COMMAND, "compile", 'c' ) )
@@ -91,7 +87,7 @@ int main( int argc, char *argv[] )
         {
             if ( strcmp( argv[i], "--global" ) == 0 )
             {
-                lDomain = GLOBAL;
+                lLocalConfig = false;
             }
             else
             {
@@ -99,32 +95,28 @@ int main( int argc, char *argv[] )
             }
         }
 
-        lConfigs = configs_parse( lDomain );
-        action_compile( lConfigs, lFlags );
+        action_compile( lLocalConfig, lFlags );
     }
 
     else if ( parse_check_value( COMMAND, "debug", 'd' ) )
     {
-        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+        lLocalConfig = 2 > argc || strcmp( argv[2], "--global" );
 
-        lConfigs = configs_parse( lDomain );
-        action_debug( lConfigs );
+        action_debug( lLocalConfig );
     }
 
     else if ( parse_check_value( COMMAND, "test", 't' ) )
     {
-        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+        lLocalConfig = 2 > argc || strcmp( argv[2], "--global" );
 
-        lConfigs = configs_parse( lDomain );
-        action_test(  lConfigs );
+        action_test( lLocalConfig );
     }
 
     else if ( parse_check_value( COMMAND, "clean", 'x' ) )
     {
-        lDomain = ( 2 < argc && strcmp( argv[2], "--global" ) == 0 ) ? GLOBAL : LOCAL;
+        lLocalConfig = 2 > argc || strcmp( argv[2], "--global" );
 
-        lConfigs = configs_parse( lDomain );
-        action_clean( lConfigs );
+        action_clean( lLocalConfig );
     }
 
     else if ( parse_check_value( COMMAND, "init", 'i' ) )
@@ -134,7 +126,7 @@ int main( int argc, char *argv[] )
             log_error( "Missing Project description" );
             print_help( INIT );
 
-            goto AfterArgumentCheck;
+            return 1;
         }
 
         InitArgs lInitArgs = {
@@ -200,16 +192,13 @@ int main( int argc, char *argv[] )
             }
         }
 
-        lConfigs = configs_parse( lDomain );
-        cmd_init( lConfigs, lInitArgs );
+        cmd_init( lLocalConfig, lInitArgs );
     }
 
     else if ( parse_check_value( COMMAND, "license", 'l' ) )
     {
         RecordsArgs lRecords;
         char *lName;
-
-        lConfigs = configs_parse( lDomain );
 
         if ( argc <=  2 )
         { }
@@ -230,17 +219,14 @@ int main( int argc, char *argv[] )
             lRecords.PrintDir = true;
         }
 
-        cmd_license( lConfigs, lRecords, lName );
+        cmd_license( lRecords, lName );
     }
 
     else if ( parse_check_value( COMMAND, "template", 'T' ) )
     {
         RecordsArgs lRecords;
         char *lTemplates[argc];
-
         bool lManage = false;
-        lConfigs = configs_parse( lDomain );
-
 
         if ( argc <=  2 )
         { }
@@ -268,7 +254,7 @@ int main( int argc, char *argv[] )
             lRecords.PrintDir = true;
         }
 
-        cmd_template( lConfigs, lRecords, lTemplates, lManage );
+        cmd_template( lRecords, lTemplates, lManage );
     }
 
     else if ( parse_check_value( COMMAND, "config", 'z' ) )
@@ -310,10 +296,5 @@ int main( int argc, char *argv[] )
         log_error( "Invalid Argument." );
         print_help( NONE );
     }
-
-AfterArgumentCheck:
-    configs_free( lConfigs );
-
-    return 0;
 }
 

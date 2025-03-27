@@ -1,29 +1,59 @@
 
 #include "Config.h"
 #include "Debug.h"
+
 #include <stdlib.h>
 
-Configs *configs_parse( ConfigDomain aDomain )
+ConfigInit *config_parse_init( void )
 {
-    debug( "*configs_parse() called" );
-    Configs *Result = malloc( sizeof( Configs ) );
+    debug( "Reading configs for init" );
+
+    ConfigInit *Result;
+    Result->Templates = config_parse_template();
 
     return Result;
 }
 
-void configs_free( Configs *aConfigs )
+char **config_parse_template( void )
 {
-    debug( "configs_free() called" );
+    debug( "Reading configs for tempaltes" );
 
-    if ( aConfigs )
-    {
-        free( aConfigs );
-    }
+    char **Result;
+
+    return Result;
 }
 
-ConfigDev *configs_dev( Configs *aConfigs )
+ConfigDev *config_parse_dev( bool aIsLocal )
 {
-    debug( "*configs_dev() called" );
-    return aConfigs->Dev;
+    debug( "Reading configs for dev" );
+
+    ConfigDev *Result;
+
+    return Result;
+}
+
+void config_free_init( ConfigInit *aInitObj )
+{
+    debug( "freeing allocated init" );
+
+    config_free_template( aInitObj->Templates );
+    free( aInitObj->GitIgnore );
+    free( aInitObj->Directories );
+    free( aInitObj->Files );
+    free( aInitObj );
+}
+
+void config_free_template( char **aTemplateObj )
+{
+    debug( "freeing allocated templates" );
+
+    free( aTemplateObj );
+}
+
+void config_free_dev( ConfigDev *aDevObj )
+{
+    debug( "freeing allocated dev" );
+
+    free( aDevObj );
 }
 
