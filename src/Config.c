@@ -15,7 +15,7 @@
 
 //- External Calls ---------------------------------------------------------------------------------
 
-ConfigInit *config_parse_init( void )
+ConfigInit *config_parse_init( char *aLanguage, bool aCopyTemplate )
 {
     debug( "Reading configs for init" );
 

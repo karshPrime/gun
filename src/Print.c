@@ -65,7 +65,8 @@ void print_help( Commands aSpecific )
             print_description( "licence [Title]", "Specify licence to use" );
             print_description( "no-git", "Omit Git initialisation" );
             print_description( "git-ignore [Args]", "Add to Git ignore list" );
-            print_description( "git-ignore-only [Args]", "Create Git ignore list with specified args" );
+            print_description( "git-ignore-only [Args]",
+                    "Create ignore list with only the specified args" );
             print_description( "template [Templates]", "Add template code to project" );
             print_description( "ignore-template", "Omit template code" );
             break;

@@ -54,7 +54,7 @@ typedef struct {
 
 //- Declarations -----------------------------------------------------------------------------------
 
-ConfigInit *config_parse_init( void );
+ConfigInit *config_parse_init( char *, bool );
 char **config_parse_template( void );
 ConfigDev *config_parse_dev( bool );
 
