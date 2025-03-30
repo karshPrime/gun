@@ -26,7 +26,6 @@ typedef unsigned int uint;
 typedef struct {
     bool        CopyConfigLocal;
     bool        GitInit;
-    char       *Title;
     char       *Command;
     char       *License;
     char      **GitIgnore;
@@ -42,7 +41,6 @@ typedef struct {
 } ConfigInit;
 
 typedef struct {
-    char      **Extensions;
     char       *Build;
     char       *Run;
     char       *Clean;

@@ -2,7 +2,6 @@
 /* Commands.h
  * 
  *
- *
  */
 
 #pragma once
@@ -20,7 +19,7 @@ typedef struct {
     char  **GitIgnore;
     char  **GitOnlyIgnore;
     char  **Templates;
-    bool    TemplateIgnore;
+    bool    CopyTemplate;
 } InitArgs;
 
 typedef struct {
@@ -32,7 +31,7 @@ typedef struct {
 
 //- Declarations -----------------------------------------------------------------------------------
 
-void cmd_init( bool, InitArgs );
-void cmd_license( RecordsArgs, char * );
-void cmd_template( RecordsArgs, char **, bool );
+void cmd_init( const bool, InitArgs * );
+void cmd_license( RecordsArgs *, char * );
+void cmd_template( RecordsArgs *, char **, bool );
 

@@ -13,7 +13,7 @@
 
 //- External Calls ---------------------------------------------------------------------------------
 
-void cmd_init( bool aLocalConfig, InitArgs aArgs )
+void cmd_init( const bool aLocalConfig, InitArgs *aArgs )
 {
     debug( "cmd_init() called" );
 
@@ -24,14 +24,14 @@ void cmd_init( bool aLocalConfig, InitArgs aArgs )
     config_free_init( lConfigs );
 }
 
-void cmd_license( RecordsArgs aArgs, char *aReplaceTitle )
+void cmd_license( RecordsArgs *aArgs, char *aReplaceTitle )
 {
     debug( "cmd_license() called" );
 
     // get all files in set directory
 }
 
-void cmd_template( RecordsArgs aArgs, char **aTemplates, bool aManage )
+void cmd_template( RecordsArgs *aArgs, char **aTemplates, bool aManage )
 {
     debug( "cmd_template() called" );
 

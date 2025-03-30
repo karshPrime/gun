@@ -134,7 +134,7 @@ int main( int argc, char *argv[] )
             .Language = argv[3],
             .Here = false,
             .NoGit = false,
-            .TemplateIgnore = false
+            .CopyTemplate = true
         };
 
         for ( int i = 4; i < argc; i++ )
@@ -142,14 +142,6 @@ int main( int argc, char *argv[] )
             if ( strcmp( argv[i], "--here" ) == 0 )
             {
                 lInitArgs.Here = true;
-            }
-            else if ( i+1 < argc && strcmp( argv[i], "--license" ) == 0 )
-            {
-                lInitArgs.License = argv[i+1];
-            }
-            else if ( strcmp( argv[i], "--no-git" ) == 0 )
-            {
-                lInitArgs.NoGit = true;
             }
             else if ( i+1 < argc && strcmp( argv[i], "--git-ignore" ) == 0 )
             {
@@ -190,9 +182,21 @@ int main( int argc, char *argv[] )
 
                 lInitArgs.Templates = lArgs;
             }
+            else if ( strcmp( argv[i], "--no-template" ) == 0 )
+            {
+                lInitArgs.CopyTemplate = false;
+            }
+            else if ( strcmp( argv[i], "--no-git" ) == 0 )
+            {
+                lInitArgs.NoGit = true;
+            }
+            else if ( i+1 < argc && strcmp( argv[i], "--license" ) == 0 )
+            {
+                lInitArgs.License = argv[i+1];
+            }
         }
 
-        cmd_init( lLocalConfig, lInitArgs );
+        cmd_init( lLocalConfig, &lInitArgs );
     }
 
     else if ( parse_check_value( COMMAND, "license", 'l' ) )
@@ -219,7 +223,7 @@ int main( int argc, char *argv[] )
             lRecords.PrintDir = true;
         }
 
-        cmd_license( lRecords, lName );
+        cmd_license( &lRecords, lName );
     }
 
     else if ( parse_check_value( COMMAND, "template", 'T' ) )
@@ -254,7 +258,7 @@ int main( int argc, char *argv[] )
             lRecords.PrintDir = true;
         }
 
-        cmd_template( lRecords, lTemplates, lManage );
+        cmd_template( &lRecords, lTemplates, lManage );
     }
 
     else if ( parse_check_value( COMMAND, "config", 'z' ) )
