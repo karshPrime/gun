@@ -6,6 +6,7 @@
 
 #include "Config.h"
 #include "Debug.h"
+#include "tomlc99/toml.h"
 
 #include <stdlib.h>
 
