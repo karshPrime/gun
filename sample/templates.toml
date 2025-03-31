@@ -1,0 +1,5 @@
+
+[template name]
+source = [ "file1", "file2", "dir", "dir2/something.c" ]
+destination = "%project%/src/lib/something"
+

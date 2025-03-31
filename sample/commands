@@ -2,30 +2,31 @@
 
 $ dev init [ProjectName] [Language]
     --here                              Create project in current directory, instead of mkdir
-    --license                           State what license to use
+    --license [Title]                   State what license to use
     --no-git                            Not initialise as git repository
     --git-ignore [Args]                 Add args to existing git ignore list
     --git-ignore-only [Args]            Create git ignore list only with these args
-    --template [Title] [Destination]    Add template code to current project, in addition to default config
+    --template [Templates]              Add template code to current project, in addition to default config
     --ignore-template                   Dont add any or all template to the project
 
 $ dev template
     --list                              List all template files
     --print-dir                         Print the location of where the templates are stored
-    --add [Title] [Destination]         Add more template code to current project
     --new [Title]                       Create new template file with the given title
+    --add [Templates]                   Add templates code to current project
+    --manage                            Manage the record of all saved templates
 
 $ dev license
     --list                              List all saved licenses
     --print-dir                         Print the location of where the licenses are stored
-    --replace [Title]                   Replace the current license with new one
     --new [Title]                       Create new license file with the given title
+    --replace [Title]                   Replace the current license with new one
 
 $ dev run {Args}                        Run the program with passed optional arguments
     --global                            Run the program with globally defined config, override local config
 
-$ dev build {Flags}                     Build the program with passed optional flags
-    --global                            Build the program with globally defined config, override local config
+$ dev compile {Flags}                   Compile the program with passed optional flags
+    --global                            Compile the program with globally defined config, override local config
 
 $ dev bun                               Build the program and then run it.
     --flags [Flags]                     Specify optional build flags
@@ -41,9 +42,10 @@ $ dev debug                             Run project specific debugger
 $ dev test                              Run the test files
     --global                            Run the test defined in the with global config, override local config
 
-$ dev help                              Print this help menu
+$ dev help {command}                    Print this help menu
 
 $ dev version                           Print utility version
 
 $ dev config
     --local                             Edit (if existing or create) local config file
+
