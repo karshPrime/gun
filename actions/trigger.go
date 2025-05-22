@@ -4,12 +4,13 @@
 package actions
 
 import (
+	"fmt"
 	"flag"
 )
 
 //- Defines ----------------------------------------------------------------------------------------
 
-const helpGlobal = "the program with globally defined config, override local config";
+const helpGlobal = "Run the command with globally defined config, override local config";
 
 type triggerConfigs struct {
 	global	bool;
@@ -20,13 +21,13 @@ type triggerConfigs struct {
 
 //- Private Helpers --------------------------------------------------------------------------------
 
-func ( configs *triggerConfigs ) parseInput( aCommand string ) {
-	flag.BoolVar( &configs.global, "global", false, aCommand + helpGlobal );
+func ( configs *triggerConfigs ) parseInput() {
+	flag.BoolVar( &configs.global, "global", false, helpGlobal );
 
 	flag.Parse();
 }
 
-func ( configs *triggerConfigs ) parseConfigs() {
+func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
 	if configs.global {
 		//
 
@@ -37,11 +38,12 @@ func ( configs *triggerConfigs ) parseConfigs() {
 
 //- Public Calls -----------------------------------------------------------------------------------
 
-func Trigger( aCommand string ) {
+func Trigger( aCommand Triggers ) {
+	fmt.Println( "trigger called with", aCommand )
 	var lTriggerConfigs triggerConfigs;
 
-	lTriggerConfigs.parseInput( aCommand );
-	lTriggerConfigs.parseConfigs();
+	lTriggerConfigs.parseInput();
+	lTriggerConfigs.parseConfigs( aCommand );
 
 	if lTriggerConfigs.cdRoot {
 		cdRoot();
