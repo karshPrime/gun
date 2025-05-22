@@ -24,6 +24,10 @@ func isGitRepo() bool {
 }
 
 func cdRoot() {
-	
+	if isGitRepo() {
+		// cd to git root
+	}
+
+	// print error
 }
 
