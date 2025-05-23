@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"path/filepath"
+	"karshPrime/gun/config"
 )
 
 //- Defines ----------------------------------------------------------------------------------------
@@ -21,6 +23,36 @@ type triggerConfigs struct {
 
 
 //- Private Helpers --------------------------------------------------------------------------------
+
+func projectLanguage() string {
+	var lExtension string
+
+	lCheckFiles := func ( aPattern string ) bool {
+		lFiles, err := filepath.Glob( aPattern )
+		if err != nil {
+			fmt.Println( "Error while searching for files:", err )
+			return false
+		}
+
+		for _, file := range lFiles {
+			if lInfo, err := os.Stat(file); err == nil && !lInfo.IsDir() {
+				lExtension = strings.ToLower( filepath.Ext(file) )
+				return true
+			}
+		}
+		return false
+	}
+
+	lFileFound := lCheckFiles( "main.*" ) || lCheckFiles( "app.*" )
+
+	if lFileFound {
+		return lExtension
+	}
+
+	fmt.Println( "Unable to find project language" );
+	os.Exit( 1 );
+	return ""
+}
 
 func ( configs *triggerConfigs ) parseInput() {
 	lLastElement := len( os.Args ) -1;
@@ -48,7 +80,8 @@ func ( configs *triggerConfigs ) parseInput() {
 
 func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
 	if configs.global {
-		//
+		lConfigFile := config.ConfigDir() + "config.toml";
+		lProjectLanguage := projectLanguage();
 
 		return;
 	}
