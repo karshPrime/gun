@@ -8,12 +8,23 @@ package actions
 type Triggers int;
 
 const (
-	Help Triggers = iota;
-	Run; Build; Test; Debug; Clean;
+	HELP Triggers = iota;
+	RUN; BUILD; TEST; DEBUG; CLEAN;
 )
 
 
 //- Private Helpers --------------------------------------------------------------------------------
+
+func triggersKey( aTrigger Triggers ) string {
+	switch aTrigger {
+		case RUN   : return "run";
+		case BUILD : return "build";
+		case TEST  : return "test";
+		case DEBUG : return "debug";
+		case CLEAN : return "clean";
+		default    : return "";
+	}
+}
 
 func isGitRepo() bool {
 	lIsRepo := false;
