@@ -5,7 +5,8 @@ package actions
 
 import (
 	"fmt"
-	"flag"
+	"os"
+	"strings"
 )
 
 //- Defines ----------------------------------------------------------------------------------------
@@ -22,9 +23,27 @@ type triggerConfigs struct {
 //- Private Helpers --------------------------------------------------------------------------------
 
 func ( configs *triggerConfigs ) parseInput() {
-	flag.BoolVar( &configs.global, "global", false, helpGlobal );
+	lLastElement := len( os.Args ) -1;
 
-	flag.Parse();
+	if lLastElement == 0 {
+		return;
+	}
+
+	lIsGlobal := func ( aIndex int ) bool {
+		return os.Args[aIndex] == "--global" || os.Args[aIndex] == "-g";
+	}
+
+	if lIsGlobal( 1 ) {
+		configs.global = true;
+		configs.command = strings.Join( os.Args[2:], " " )
+
+	} else if lIsGlobal( lLastElement ) {
+		configs.global = true;
+		configs.command = strings.Join( os.Args[1:lLastElement], " " )
+
+	} else {
+		configs.command = strings.Join( os.Args[1:], " " )
+	}
 }
 
 func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
@@ -39,13 +58,12 @@ func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
 //- Public Calls -----------------------------------------------------------------------------------
 
 func Trigger( aCommand Triggers ) {
-	fmt.Println( "trigger called with", aCommand )
-	var lTriggerConfigs triggerConfigs;
+	var lConfigs triggerConfigs;
 
-	lTriggerConfigs.parseInput();
-	lTriggerConfigs.parseConfigs( aCommand );
+	lConfigs.parseInput();
+	lConfigs.parseConfigs( aCommand );
 
-	if lTriggerConfigs.cdRoot {
+	if lConfigs.cdRoot {
 		cdRoot();
 	}
 
