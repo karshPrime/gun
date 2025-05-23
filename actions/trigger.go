@@ -1,4 +1,3 @@
-
 // actions/trigger.go
 
 package actions
@@ -9,6 +8,7 @@ import (
 	"strings"
 	"path/filepath"
 	"karshPrime/gun/config"
+	"github.com/pelletier/go-toml"
 )
 
 //- Defines ----------------------------------------------------------------------------------------
@@ -83,7 +83,38 @@ func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
 		lConfigFile := config.ConfigDir() + "config.toml";
 		lProjectLanguage := projectLanguage();
 
-		return;
+		lConfigData, err := os.ReadFile( lConfigFile )
+		if err != nil {
+			return;
+		}
+
+		lTree, err := toml.Load( string(lConfigData) )
+		if err != nil {
+			return;
+		}
+
+		lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ))
+
+		section := lTree.Get( lLangKey )
+		if section == nil {
+			return;
+		}
+
+		lSectionMap, ok := section.( *toml.Tree )
+		if !ok {
+			return;
+		}
+
+		lCommand := lSectionMap.Get( triggersKey( aCommand ))
+
+		if lCommandStr, ok := lCommand.( string ); ok {
+			configs.command = lCommandStr + " " + configs.command
+		}
+
+		configs.cdRoot = false
+		if lcdRootValue := lSectionMap.Get("cd_root"); lcdRootValue != nil {
+			configs.cdRoot, _ = lcdRootValue.( bool )
+		}
 	}
 }
 
