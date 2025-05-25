@@ -3,8 +3,8 @@
 package actions
 
 import (
-	"fmt"
 	"os"
+	"fmt"
 	"strings"
 	"path/filepath"
 	"karshPrime/gun/config"
@@ -25,32 +25,54 @@ type triggerConfigs struct {
 //- Private Helpers --------------------------------------------------------------------------------
 
 func projectLanguage() string {
-	var lExtension string
+	var lExtension string;
+	var lFound bool = false;
 
-	lCheckFiles := func ( aPattern string ) bool {
-		lFiles, err := filepath.Glob( aPattern )
-		if err != nil {
-			fmt.Println( "Error while searching for files:", err )
-			return false
-		}
-
-		for _, file := range lFiles {
-			if lInfo, err := os.Stat(file); err == nil && !lInfo.IsDir() {
-				lExtension = strings.ToLower( filepath.Ext(file) )
-				return true
-			}
-		}
-		return false
+	lCheckMatch := func( name string ) bool {
+		lBase := filepath.Base( name )
+		lMatchMain, _ := filepath.Match( "main.*", lBase )
+		lMatchApp, _ := filepath.Match( "app.*", lBase )
+		return lMatchMain || lMatchApp
 	}
 
-	lFileFound := lCheckFiles( "main.*" ) || lCheckFiles( "app.*" )
+	err := filepath.Walk( ".", func( aPath string, aInfo os.FileInfo, aErr error ) error {
+		if aErr != nil {
+			return aErr
+		}
 
-	if lFileFound {
+		// Skip if it's a directory
+		if aInfo.IsDir() {
+			lRelPath := strings.Count( filepath.Clean(aPath), string(os.PathSeparator) )
+			if lRelPath > 2 {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		lDepth := strings.Count( filepath.Clean(aPath), string(os.PathSeparator) )
+		if lDepth > 2 {
+			return nil
+		}
+
+		if lCheckMatch( aPath ) {
+			lExtension = strings.ToLower( filepath.Ext( aPath ))
+			lFound = true
+			return filepath.SkipDir // stop search early
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println( "Error while searching for files:", err )
+		os.Exit( 1 )
+	}
+
+	if lFound {
 		return lExtension
 	}
 
-	fmt.Println( "Unable to find project language" );
-	os.Exit( 1 );
+	fmt.Println( "Unable to find project language" )
+	os.Exit( 1 )
 	return ""
 }
 
@@ -78,44 +100,97 @@ func ( configs *triggerConfigs ) parseInput() {
 	}
 }
 
-func ( configs *triggerConfigs ) parseConfigs( aCommand Triggers ) {
+func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
+	lStatus := false;
+	lTriggerKey :=  triggersKey( aTrigger );
+	lGlobalConfigFile := config.ConfigDir() + "config.toml";
+
+	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
+	if err != nil {
+		return false;
+	}
+
+	lTree, err := toml.Load( string(lGlobalConfigData) )
+	if err != nil {
+		return false;
+	}
+
 	if configs.global {
-		lConfigFile := config.ConfigDir() + "config.toml";
 		lProjectLanguage := projectLanguage();
 
-		lConfigData, err := os.ReadFile( lConfigFile )
-		if err != nil {
-			return;
-		}
+		lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ));
 
-		lTree, err := toml.Load( string(lConfigData) )
-		if err != nil {
-			return;
-		}
-
-		lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ))
-
-		section := lTree.Get( lLangKey )
+		section := lTree.Get( lLangKey );
 		if section == nil {
-			return;
+			fmt.Println( "ERROR:", lProjectLanguage, " config not found" );
+			return false;
 		}
 
-		lSectionMap, ok := section.( *toml.Tree )
+		lSectionMap, ok := section.( *toml.Tree );
 		if !ok {
-			return;
+			return false;
 		}
 
-		lCommand := lSectionMap.Get( triggersKey( aCommand ))
+		lCommand := lSectionMap.Get( lTriggerKey );
 
 		if lCommandStr, ok := lCommand.( string ); ok {
-			configs.command = lCommandStr + " " + configs.command
+			configs.command = lCommandStr + " " + configs.command;
+			lStatus = true;
 		}
 
 		configs.cdRoot = false
 		if lcdRootValue := lSectionMap.Get("cd_root"); lcdRootValue != nil {
 			configs.cdRoot, _ = lcdRootValue.( bool )
 		}
+
+		return lStatus;
 	}
+
+	lLocalConfigFile := ""
+	if lLocalSection := lTree.Get( "local" ); lLocalSection != nil {
+		if lLocalMap, ok := lLocalSection.( *toml.Tree ); ok {
+			if lFileName := lLocalMap.Get("config_title"); lFileName != nil {
+				lLocalConfigFile, _ = lFileName.(string)
+			}
+		}
+	}
+
+	if lLocalConfigFile == "" {
+		lLocalConfigFile = "commands"
+	}
+
+	lData, err := os.ReadFile( lLocalConfigFile );
+	if err != nil {
+		return false;
+	}
+
+	lLines := strings.Split( string(lData), "\n" )
+	lCommandMap := make( map[string]string );
+
+	for _, line := range lLines {
+		line = strings.TrimSpace(line);
+		if line == "" || strings.HasPrefix( line, "//" ) {
+			continue;
+		}
+
+		if strings.Contains( line, "=" ) {
+			lParts := strings.SplitN( line, "=", 2 );
+			lKey := strings.TrimSpace( lParts[0] );
+			lVal := strings.TrimSpace( lParts[1] );
+			lVal = strings.Trim( lVal, `',` ); // trim quotes and trailing comma
+
+			if lKey == "cd_root" {
+				configs.cdRoot = lVal == "true";
+			} else {
+				lCommandMap[lKey] = lVal;
+			}
+		}
+	}
+
+	lCommand, lStatus := lCommandMap[lTriggerKey];
+	configs.command = lCommand + " " + configs.command;
+
+	return lStatus;
 }
 
 
@@ -125,7 +200,11 @@ func Trigger( aCommand Triggers ) {
 	var lConfigs triggerConfigs;
 
 	lConfigs.parseInput();
-	lConfigs.parseConfigs( aCommand );
+	lStatus := lConfigs.parseConfigs( aCommand );
+
+	if !lStatus  {
+		return;
+	}
 
 	if lConfigs.cdRoot {
 		cdRoot();
