@@ -4,8 +4,9 @@
 **/.DS_Store
 **/todo
 
-.cache/
-build/
-todo/
-obj/
+go.sum
+go.mod
+
+gun
+bin/
 
