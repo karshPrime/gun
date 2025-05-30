@@ -1,10 +1,10 @@
-
 // logs/print.go
 
 package logs
 
-import ()
-
+import (
+	// "fmt"
+)
 
 //- Defines ----------------------------------------------------------------------------------------
 
@@ -14,7 +14,12 @@ import ()
 
 //- Public Calls -----------------------------------------------------------------------------------
 
-func Help() {
+
+func ErrorPrint( aPrompt string ) {
+
+}
+
+func WarningPrint( aPrompt string ) {
 
 }
 

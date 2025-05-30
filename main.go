@@ -29,7 +29,7 @@ func main() {
 		case "t", "test"  : actions.Trigger( actions.TEST  );
 
 		case "i", "init" : actions.Init();
-		case "h", "help" : logs.Help();
+		case "h", "help", "--help", "-h" : logs.Help();
 
 		case "T", "template" : templates.Template();
 		case "l", "license"  : licenses.License();
