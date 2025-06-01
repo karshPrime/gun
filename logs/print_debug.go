@@ -16,32 +16,35 @@ import (
 func lineInfo() string  {
 	_, lFile, lLine, ok := runtime.Caller( 2 )
 	if ok {
-		return fmt.Sprintf( "(%s:%d)", lFile, lLine )
+		return fmt.Sprintf( "(%s:%d) ", lFile, lLine )
 	} else {
-		return "(Could not retrieve caller information)"
+		return "(Could not retrieve caller information) "
 	}
 }
 
 //- Public Calls -----------------------------------------------------------------------------------
 
-func ErrorPrint( aPrompt string ) {
+func ErrorPrint( aPrompt any, args ...any ) {
 	lRed := color.New( color.FgRed ).SprintFunc();
 	lLiRed := color.New( color.FgHiRed ).SprintFunc();
 
-	fmt.Fprintln( os.Stderr, lRed("[ERROR]"), lLiRed(lineInfo()), aPrompt );
+	fmt.Fprint( os.Stderr, lRed("[ERROR] "), lLiRed(lineInfo()), aPrompt );
+	fmt.Fprintln( os.Stderr, args... );
 }
 
-func WarningPrint( aPrompt string ) {
+func WarningPrint( aPrompt any, args ...any ) {
 	lYellow := color.New( color.FgYellow ).SprintFunc();
 	lLiYellow := color.New( color.FgHiYellow ).SprintFunc();
 
-	fmt.Fprintln( os.Stderr, lYellow("[WARNING]"), lLiYellow(lineInfo()), aPrompt );
+	fmt.Fprint( os.Stderr, lYellow("[WARNING] "), lLiYellow(lineInfo()), aPrompt );
+	fmt.Fprintln( os.Stderr, args... );
 }
 
-func DebugPrint( aPrompt string ) {
+func DebugPrint( aPrompt any, args ...any ) {
 	lBlue := color.New( color.FgBlue ).SprintFunc();
 	lLiBlue := color.New( color.FgHiBlue ).SprintFunc();
 
-	fmt.Fprintln( os.Stderr, lBlue("[DEBUG]"), lLiBlue(lineInfo()), aPrompt );
+	fmt.Fprint( os.Stderr, lBlue("[DEBUG] "), lLiBlue(lineInfo()), aPrompt );
+	fmt.Fprintln( os.Stderr, args... );
 }
 

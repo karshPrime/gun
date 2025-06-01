@@ -101,21 +101,24 @@ func ( configs *triggerConfigs ) parseInput() {
 }
 
 func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers ) bool {
-	logs.DebugPrint( "global config parse" );
+	logs.DebugPrint( "Global config parse" );
 
 	lStatus := false;
 	lTriggerKey := triggersKey( aTrigger );
 	lProjectLanguage := projectLanguage();
 	lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ));
 
-	section := aTree.Get( lLangKey );
-	if section == nil {
-		logs.ErrorPrint( lProjectLanguage + "config not found" );
+	lSection := aTree.Get( lLangKey );
+	if lSection == nil {
+		logs.ErrorPrint( "Config not found for ", lProjectLanguage[1:], "language" );
 		return false;
 	}
 
-	lSectionMap, ok := section.( *toml.Tree );
+	lSectionMap, ok := lSection.( *toml.Tree );
 	if !ok {
+		logs.ErrorPrint( "Unable to parse global configs for ", lProjectLanguage[1:],
+			". Check Syntax." );
+
 		return false;
 	}
 
@@ -134,7 +137,7 @@ func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger T
 }
 
 func ( configs *triggerConfigs ) localConfigParse( aTrigger Triggers, aData string ) bool {
-	logs.DebugPrint( "local parse" );
+	logs.DebugPrint( "Local config parse" );
 
 	lTriggerKey := triggersKey( aTrigger );
 
@@ -173,13 +176,13 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 	lGlobalConfigFile := config.ConfigDir() + "config.toml";
 	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
 	if err != nil {
-		logs.ErrorPrint( "Unable to read global config file\n" + err.Error() );
+		logs.ErrorPrint( "Unable to read global config file\n", err );
 		return false;
 	}
 
 	lTree, err := toml.Load( string( lGlobalConfigData ));
 	if err != nil {
-		logs.ErrorPrint( "Unable to read parse config file. Check syntax\n" + err.Error() );
+		logs.ErrorPrint( "Unable to read parse config file. Check syntax\n", err );
 		return false;
 	}
 
@@ -226,8 +229,7 @@ func Trigger( aCommand Triggers ) {
 	lStatus := lConfigs.parseConfigs( aCommand );
 
 	if !lStatus {
-		logs.ErrorPrint( "No config found for "+ lConfigs.command )
-		logs.DebugPrint( "No command found" );
+		logs.ErrorPrint( "Config not found for ",  triggersKey(aCommand), "command" );
 		return; 
 	}
 

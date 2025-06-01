@@ -37,13 +37,13 @@ func triggersKey( aTrigger Triggers ) string {
 func cdRoot() bool {
 	lResult, lError := sysRun( "git rev-parse --show-toplevel" );
 	if lError {
-		logs.ErrorPrint( "Project is not a git repo. Cannot cd to project root.\n" + lResult );
+		logs.ErrorPrint( "Project is not a git repo. Cannot cd to project root.\n", lResult );
 		return false;
 	}
 
-	lErrorCD:= os.Chdir( lResult );
+	lErrorCD := os.Chdir( lResult );
     if lErrorCD != nil {
-        logs.ErrorPrint( "Unable to cd to project root.\n" + lErrorCD.Error() )
+        logs.ErrorPrint( "Unable to cd to project root.\n", lErrorCD )
 		return false;
     }
 

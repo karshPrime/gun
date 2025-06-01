@@ -239,7 +239,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		default:
-			ErrorPrint( "invalid command " + aCommand );
+			ErrorPrint( "Invalid Command ", aCommand );
 			helpAll();
 			return;
 	}

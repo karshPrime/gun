@@ -54,13 +54,13 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 
 	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
 	if err != nil {
-		logs.ErrorPrint( "Error reading config file:" + err.Error() );
+		logs.ErrorPrint( "Unable to read config file:", err );
 		return false;
 	}
 
 	lTree, err := toml.Load( string(lGlobalConfigData) );
 	if err != nil {
-		fmt.Println( "Error loading TOML:", err );
+		logs.ErrorPrint( "Unable to load TOML:", err );
 		return false;
 	}
 

@@ -12,19 +12,23 @@ import (
 
 //- Public Calls -----------------------------------------------------------------------------------
 
-func ErrorPrint( aPrompt string ) {
-	lRed := color.New( color.FgHiRed ).SprintFunc();
+func ErrorPrint( aPrompt any, args ...any ) {
+	lRed := color.New( color.FgRed ).SprintFunc();
+	lLiRed := color.New( color.FgHiRed ).SprintFunc();
 
-	fmt.Fprintln( os.Stderr, lRed("[Error]"), aPrompt );
+	fmt.Fprint( os.Stderr, lRed("[Error] "), lLiRed(aPrompt) )
+	fmt.Fprintln( os.Stderr, args... );
 }
 
-func WarningPrint( aPrompt string ) {
-	lYellow := color.New( color.FgHiYellow ).SprintFunc();
+func WarningPrint( aPrompt any, args ...any ) {
+	lYellow := color.New( color.FgYellow ).SprintFunc();
+	lLiYellow := color.New( color.FgHiYellow ).SprintFunc();
 
-	fmt.Fprintln( os.Stderr, lYellow("[Warning]"), aPrompt );
+	fmt.Fprint( os.Stderr, lYellow("[Warning] "), lLiYellow(aPrompt) );
+	fmt.Fprintln( os.Stderr, args... );
 }
 
-func DebugPrint( _ string ) {
+func DebugPrint( _ any, args ...any ) {
 	return;
 }
 
