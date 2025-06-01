@@ -14,7 +14,7 @@ func main() {
 	config.ValidateFilesystem();
 
 	if len( os.Args ) < 2 {
-		actions.BuildRun();
+		actions.BuildRun( os.Args );
 		return;
 	}
 
@@ -35,7 +35,7 @@ func main() {
 		case "l", "license"  : licenses.License();
 
 		default:
-			actions.BuildRun();
+			actions.BuildRun( lOriginalArgs );
 	}
 }
 
