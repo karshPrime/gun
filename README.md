@@ -19,5 +19,28 @@ and run it the same way every time.
 - Git setup on project creation
 - Simple and extendable `.toml` config format
 
-# ⚠️ Work In Progress  ⚠️
+---
+
+⚠️ Work In Progress  ⚠️
+
+### Current Progress
+- [x] Set project structure
+- [x] Global config parser
+- [x] Local config parser
+- [x] Fallback to global config when local is missing
+- [x] `run`, `compile`, and `debug` commands implemented
+- [x] Git repository initialisation
+- [x] Help command with detailed usage and logging
+- [x] Parse `init` config definitions
+- [ ] Create new project with structure and files
+- [ ] Copy license file into project
+- [ ] Copy template files into project
+- [ ] **`init` command: Completed**
+- [ ] View/manage saved licenses
+- [ ] Replace current license
+- [ ] **License system: Completed**
+- [ ] View/manage saved templates
+- [ ] Create new template files
+- [ ] Add templates to projects
+- [ ] **Template system: Completed**
 
