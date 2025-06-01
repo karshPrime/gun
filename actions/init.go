@@ -17,7 +17,7 @@ import (
 const helpHere = "Create project in current directory, instead of mkdir"
 const helpLicense = "State what license to use"
 
-type templates struct {
+type template struct {
 	title		string;
 	destination	string;
 }
@@ -29,7 +29,7 @@ type initConfigs struct {
 	noGit		bool;
 	gitIgnores	[]string;
 	noTemplates bool;
-	templates	[]templates;
+	templates	[]template;
 	directories	[]string;
 };
 
@@ -109,7 +109,7 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 					if destination, destOk := tree.Get( "destination" ).( string ); destOk {
 						configs.templates = append(
 							configs.templates,
-							templates{ title: title, destination: destination },
+							template{ title: title, destination: destination },
 						);
 					}
 				}

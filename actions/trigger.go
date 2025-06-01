@@ -238,7 +238,7 @@ func Trigger( aCommand Triggers ) {
 	}
 
 	// run command
-	lResult, lError := sysRun( lConfigs.command );
+	lResult, lError := SysRun( lConfigs.command );
 	if lError {
 		logs.ErrorPrint( lResult );
 		return;

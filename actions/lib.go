@@ -5,8 +5,8 @@ package actions
 
 import (
 	"os"
-	"fmt"
 	"bytes"
+	"strings"
 	"os/exec"
 	"karshPrime/gun/logs"
 )
@@ -35,7 +35,7 @@ func triggersKey( aTrigger Triggers ) string {
 }
 
 func cdRoot() bool {
-	lResult, lError := sysRun( "git rev-parse --show-toplevel" );
+	lResult, lError := SysRun( "git rev-parse --show-toplevel" );
 	if lError {
 		logs.ErrorPrint( "Project is not a git repo. Cannot cd to project root.\n", lResult );
 		return false;
@@ -50,8 +50,8 @@ func cdRoot() bool {
 	return true;
 }
 
-func sysRun( aCommand string ) ( Result string, Error bool ) {
-	fmt.Println( aCommand );
+func SysRun( aCommand string ) ( Result string, Error bool ) {
+	logs.DebugPrint( aCommand );
 	lShell, lArgs := systemShell( aCommand );
 
 	if lShell == "" {
@@ -66,9 +66,9 @@ func sysRun( aCommand string ) ( Result string, Error bool ) {
 	lCommand.Stderr = &lStdErr;
 
 	if lCommand.Run() != nil {
-		return lStdErr.String(), true;
+		return strings.TrimSpace( lStdErr.String() ), true;
 	}
 
-	return lStdOut.String(), false;
+	return strings.TrimSpace( lStdOut.String() ), false;
 }
 
