@@ -31,6 +31,7 @@ type initConfigs struct {
 	noTemplates bool;
 	templates	[]template;
 	directories	[]string;
+	files		[]string;
 };
 
 
@@ -126,6 +127,16 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 		}
 	}
 
+	// Parse files
+	configs.files = []string{ "README.md" }; // always create readme
+	if lParsedFiles := lSectionMap.Get( "files" ); lParsedFiles != nil {
+		if files, ok := lParsedFiles.( []any ); ok {
+			for _, dir := range files {
+				configs.files = append( configs.files , dir.(string) );
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -166,30 +177,44 @@ func Init() {
 		err := os.Mkdir( lOriginalArgs[1], 0755 );
 		if err != nil {
 			if os.IsExist(err) {
-				logs.ErrorPrint("Directory %s already exists\n", lOriginalArgs[1] );
+				logs.ErrorPrint("Project directory already exists" );
+				return;
 			} else {
-				logs.ErrorPrint( "Unable to create directory: %v\n", err );
+				logs.ErrorPrint( "Unable to create directory: %v", err );
 				return;
 			}
 		}
 
 		err = os.Chdir( lOriginalArgs[1] );
 		if err != nil {
-			logs.ErrorPrint( "Unable to change directory: %v\n", err );
+			logs.ErrorPrint( "Unable to change directory: %v", err );
 			return;
 		}
 	}
 
-	// Create a new directory
+	// Create new directories
 	for _, lDirName := range lConfigs.directories {
 		err := os.Mkdir( lDirName, 0755 );
 		if err != nil {
 			if os.IsExist(err) {
-				logs.WarningPrint( "Directory %s already exists. Skipping\n", lDirName );
+				logs.WarningPrint( lDirName, "directory already exists. Skipping" );
 			} else {
-				logs.WarningPrint( "Unable to create directory %s: %v\n", lDirName, err );
+				logs.WarningPrint( "Unable to create directory %s: %v", lDirName, err );
 			}
 		}
+	}
+
+	// Create new files
+	for _, lFileName := range lConfigs.files {
+		file, err := os.Create( lFileName );
+		if err != nil {
+			if os.IsExist(err) {
+				logs.WarningPrint( lFileName, "file already exists. Skipping" );
+			} else {
+				logs.WarningPrint( "Unable to create directory %s: %v", lFileName, err );
+			}
+		}
+		file.Close();
 	}
 
 	// Copy all templates
@@ -198,7 +223,7 @@ func Init() {
 			lTitle := config.ConfigDir() + "templates/" + lTemplate.title;
 
 			if Copy( lTitle, lTemplate.destination ) {
-				logs.ErrorPrint( "Unable to copy template from %s to %s\n",
+				logs.ErrorPrint( "Unable to copy template from %s to %s",
 					lTemplate.title, lTemplate.destination );
 			}
 		}
@@ -207,12 +232,14 @@ func Init() {
 	// Copy License
 	if lConfigs.license != "" {
 		lLicensePath := config.ConfigDir() + "licenses/" + lConfigs.license;
-		Copy( lLicensePath, "." );
+		logs.DebugPrint( lLicensePath );
+		Copy( lLicensePath, "./LICENSE" );
 	}
 
 	// Run init command
 	lResult, lError := SysRun( lConfigs.command );
-	if lError {
+	if lResult == "" {
+	} else if lError {
 		logs.ErrorPrint( lResult );
 	} else  {
 		fmt.Println( lResult );
@@ -234,7 +261,6 @@ func Init() {
 			logs.ErrorPrint( err );
 			return;
 		}
-		fmt.Println( lResult );
 
 		lResult, err = SysRun( "git commit -m \"init: project\"" );
 		if err {
