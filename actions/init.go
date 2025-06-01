@@ -39,7 +39,7 @@ type initConfigs struct {
 func ( configs *initConfigs ) parseInput() {
 	flag.BoolVar( &configs.here, "here", false, helpHere );
 	flag.BoolVar( &configs.noGit, "no-git", false, helpHere );
-	flag.BoolVar( &configs.noTemplates, "ignore-templates", false, helpHere );
+	flag.BoolVar( &configs.noTemplates, "no-templates", false, helpHere );
 	flag.StringVar( &configs.license, "license", "", helpLicense );
 
 	flag.Parse();
@@ -85,29 +85,33 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 		}
 	}
 
-	// Parse git_init
-	if lParsedGitInit := lSectionMap.Get( "git_init" ); lParsedGitInit != nil {
-		configs.noGit = lParsedGitInit.( bool );
-	}
+	if !configs.noGit {
+		// Parse git_init
+		if lParsedGitInit := lSectionMap.Get( "git_init" ); lParsedGitInit != nil {
+			configs.noGit = !lParsedGitInit.( bool );
+		}
 
-	// Parse git_ignore
-	if lParsedGitIgnore := lSectionMap.Get( "git_ignore" ); lParsedGitIgnore != nil {
-		if gitIgnores, ok := lParsedGitIgnore.( []any ); ok {
-			for _, item := range gitIgnores {
-				configs.gitIgnores = append( configs.gitIgnores, item.(string) );
+		// Parse git_ignore
+		if lParsedGitIgnore := lSectionMap.Get( "git_ignore" ); lParsedGitIgnore != nil {
+			if gitIgnores, ok := lParsedGitIgnore.( []any ); ok {
+				for _, item := range gitIgnores {
+					configs.gitIgnores = append( configs.gitIgnores, item.(string) );
+				}
 			}
 		}
 	}
 
 	// Parse templates
-	if lParsedTemplates, ok := lSectionMap.Get( "templates" ).( []*toml.Tree ); ok {
-		for _, tree := range lParsedTemplates {
-			if title, titleOk := tree.Get( "title" ).( string ); titleOk {
-				if destination, destOk := tree.Get( "destination" ).( string ); destOk {
-					configs.templates = append(
-						configs.templates,
-						templates{ title: title, destination: destination },
-					);
+	if !configs.noTemplates {
+		if lParsedTemplates, ok := lSectionMap.Get( "templates" ).( []*toml.Tree ); ok {
+			for _, tree := range lParsedTemplates {
+				if title, titleOk := tree.Get( "title" ).( string ); titleOk {
+					if destination, destOk := tree.Get( "destination" ).( string ); destOk {
+						configs.templates = append(
+							configs.templates,
+							templates{ title: title, destination: destination },
+						);
+					}
 				}
 			}
 		}
