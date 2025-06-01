@@ -17,7 +17,18 @@ const aboutCommandConfig   = "Edit or create a local project configuration file"
 const aboutCommandTemplate = "Manage project templates (add, create, list)";
 const aboutCommandLicense  = "Manage license files (create, replace, list)";
 
-const aboutFlagGlobal = "";
+const aboutFlagLocal    = "Edit the local config file instead of the global one"
+const aboutFlagGlobal   = "Run the command using the global config, overriding the local config";
+const aboutFlagNoGit    = "Create the project but not git repository";
+const aboutFlagHere     = "Create the project in the current dir, instead of making a new one";
+const aboutFlagLicense  = "Use the specified license for the project instead of the config defined";
+const aboutFlagList     = "List all saved ";  // + license / template
+const aboutFlagAdd      = "Add a saved template to the current project";
+const aboutFlagNew      = "Create a new "; // + license / template
+const aboutFlagReplace  = "Replace the current license with a new one";
+const aboutFlagManage   = "Manage all saved templates";
+const aboutFlagPrintDir = "Directory where all files are saved";
+const aboutFlagNoTemplates = "Do not copy any config defined templates to the project";
 
 type printInfo struct {
 	about	string;
@@ -28,7 +39,6 @@ type printInfo struct {
 
 func helpAll() {
 	fmt.Println(
-		"\n",
 		"\nUSAGE:",
 		"\n  $ gun [command] [flags]",
 		"\n",
@@ -51,7 +61,7 @@ func helpAll() {
 		"\n  $ gun run --help",
 		"\n",
 		"\n  # Compile with extra flags and run with arguments",
-		"\n  $ gun --flags -Wall --args \"hello world\"",
+		"\n  $ gun \"hello world\" --flags -Wall",
 		"\n",
 		"\n  # Initialise a new C project using GPLv2 license",
 		"\n  $ gun init my_project c --license GPLv2",
@@ -81,105 +91,107 @@ func Help() {
 func HelpCommand( aCommand string ) {
 	var lFlags []printInfo;
 	var lExamples []printInfo;
-	var lParameters string = "";
+	var lParameters string = "[arguments] [flags]";
+	var lNote string;
 
 	switch ( aCommand ) {
 		case "run":
 			fmt.Println( aboutCommandRun );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "global",
-			}};
+			lParameters = "[arguments]";
 			lExamples = []printInfo{{
-				about: "",
+				about: "Run the last compiled Go program",
 				command: "",
+			},{
+				about: "Run the last compiled C program",
+				command: "",
+			},{
+				about: "Run the last compiled program with `\"hello world\" 1234` passed as arguments",
+				command: "\"hello world\" 1234",
 			}};
 
 		case "build":
 			fmt.Println( aboutCommandBuild );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "global",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagGlobal, command: "global" },
+			};
 			lExamples = []printInfo{{
-				about: "",
+				about: "Build the Go project",
 				command: "",
+			},{
+				about: "Build the Java project with `-g:none` parameters",
+				command: "-g:none",
+			},{
+				about: "Build the C flag with default configs and with -Wextra -std=c11 parameters",
+				command: "-Wextra -std=c11 --global",
 			}};
 
 		case "debug":
 			fmt.Println( aboutCommandDebug );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "global",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagGlobal, command: "global" },
+			};
 			lExamples = []printInfo{{
-				about: "",
+				about: "Run the set debugger for the project",
 				command: "",
+			},{
+				about: "Run the default debugger with `-batch -ex \"run\" -ex \"bt\"` arguments",
+				command: "-batch -ex \"run\" -ex \"bt\" --global",
 			}};
 
 		case "test":
 			fmt.Println( aboutCommandTest );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "global",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagGlobal, command: "global" },
+			};
 			lExamples = []printInfo{{
-				about: "",
+				about: "Run the defined test suite",
 				command: "",
+			},{
+				about: "Run the global defined test suit with `\"foo\" \"bar\"` arguments",
+				command: "foo bar --global",
 			}};
 
 		case "clean":
 			fmt.Println( aboutCommandClean );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "global",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagGlobal, command: "global" },
+			};
 			lExamples = []printInfo{{
-				about: "",
+				about: "Clean the project",
 				command: "",
+			},{
+				about: "Clean the project as defined in global config",
+				command: "--global",
 			}};
+			lNote = "You can create shell scripts for each project to define additional"+
+			" subcommands, such as\n  `fullclean` and buildclean by including `sh" +
+			" cleanscript.sh` in your config.\n  Alternatively, you can simply add a command like" +
+			" \"rm -rf ./build/*\"";
+
 
 		case "init":
 			fmt.Println( aboutCommandInit );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "here",
-			},{
-				about: aboutFlagGlobal,
-				command: "license",
-			},{
-				about: aboutFlagGlobal,
-				command: "no-git",
-			},{
-				about: aboutFlagGlobal,
-				command: "no-templates",
-			},{
-				about: aboutFlagGlobal,
-				command: "license",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagHere,        command: "here" },
+				{ about: aboutFlagNoGit,       command: "no-git" },
+				{ about: aboutFlagNoTemplates, command: "no-templates" },
+				{ about: aboutFlagLicense,     command: "license [title]", },
+			};
 			lExamples = []printInfo{{
 				about: "",
 				command: "",
 			}};
+			lParameters = "{project name} {project language} [flags]";
 
 		case "template":
 			fmt.Println( aboutCommandTemplate );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "list",
-			},{
-				about: aboutFlagGlobal,
-				command: "print-dir",
-			},{
-				about: aboutFlagGlobal,
-				command: "new [title]",
-			},{
-				about: aboutFlagGlobal,
-				command: "add [title]",
-			},{
-				about: aboutFlagGlobal,
-				command: "manage",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagList+"template", command: "list" },
+				{ about: aboutFlagPrintDir, command:"print-dir" },
+				{ about: aboutFlagNew+"template", command: "new [title]" },
+				{ about: aboutFlagAdd,      command: "add [title]" },
+				{ about: aboutFlagManage,   command: "manage"},
+			};
 			lExamples = []printInfo{{
 				about: "",
 				command: "",
@@ -187,30 +199,25 @@ func HelpCommand( aCommand string ) {
 
 		case "config":
 			fmt.Println( aboutCommandConfig );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "local",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagLocal, command: "local" },
+			};
 			lExamples = []printInfo{{
-				about: "",
+				about: "Update global config",
 				command: "",
+			},{
+				about: "Update local config",
+				command: "--local",
 			}};
 
 		case "license":
 			fmt.Println( aboutCommandLicense );
-			lFlags = []printInfo{{
-				about: aboutFlagGlobal,
-				command: "list",
-			},{
-				about: aboutFlagGlobal,
-				command: "print-dir",
-			},{
-				about: aboutFlagGlobal,
-				command: "new [title]",
-			},{
-				about: aboutFlagGlobal,
-				command: "replace [title]",
-			}};
+			lFlags = []printInfo{
+				{ about: aboutFlagList+"license",     command: "list" },
+				{ about: aboutFlagPrintDir, command: "print-dir" },
+				{ about: aboutFlagNew+"license",      command: "new [title]" },
+				{ about: aboutFlagReplace,  command: "replace [title]"},
+			};
 			lExamples = []printInfo{{
 				about: "",
 				command: "",
@@ -225,21 +232,27 @@ func HelpCommand( aCommand string ) {
 	fmt.Println(
 		"\nUSAGE:",
 		"\n  $ gun", aCommand, lParameters,
-		"\n",
-		"\nFLAGS:",
 	);
 
-	for i := range len( lFlags ) {
-		fmt.Printf( "  --%v\t\t%v\n", lFlags[i].command, lFlags[i].about );
+	if len( lFlags ) > 0 {
+		fmt.Println( "\nFLAGS:" );
+
+		for i := range len( lFlags ) {
+			fmt.Printf( "  --%-17v %v\n", lFlags[i].command, lFlags[i].about );
+		}
 	}
 
-	fmt.Println( "\nEXAMPLES:" );
+	fmt.Print( "\nEXAMPLES:" );
 
 	for i := range len( lExamples ) {
 		fmt.Printf(
-			"  # %v\n  $ gun %v %v\n",
+			"\n  # %v\n  $ gun %v %v\n",
 			lExamples[i].about , aCommand, lExamples[i].command,
 		);
+	}
+
+	if len(lNote) > 0 {
+		fmt.Println( "\nNote:\n ",  lNote );
 	}
 }
 

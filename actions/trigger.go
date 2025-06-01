@@ -14,8 +14,6 @@ import (
 
 //- Defines ----------------------------------------------------------------------------------------
 
-const helpGlobal = "Run the command with globally defined config, override local config";
-
 type triggerConfigs struct {
 	global	bool;
 	cdRoot	bool;
