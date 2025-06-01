@@ -152,20 +152,96 @@ func Init() {
 	lConfigs.parseInput();
 	lConfigs.parseConfigs( lOriginalArgs[2] );
 
-	// run commands
+	// logs.ErrorPrint( "command\t\t:", lConfigs.command )
+	// logs.ErrorPrint( "here\t\t:", lConfigs.here )
+	// logs.ErrorPrint( "license\t\t:", lConfigs.license )
+	// logs.ErrorPrint( "noGit\t\t:", lConfigs.noGit )
+	// logs.ErrorPrint( "gitIgnores\t:", lConfigs.gitIgnores )
+	// logs.ErrorPrint( "noTemplates\t:", lConfigs.noTemplates )
+	// logs.ErrorPrint( "templates\t:", lConfigs.templates )
+	// logs.ErrorPrint( "directories\t:", lConfigs.directories )
+
+	// Create project directory and cd into it
 	if !lConfigs.here {
-		// mkdir lOriginalArgs[1];
-		// cd lOriginalArgs[1]
+		err := os.Mkdir( lOriginalArgs[1], 0755 );
+		if err != nil {
+			if os.IsExist(err) {
+				logs.ErrorPrint("Directory %s already exists\n", lOriginalArgs[1] );
+			} else {
+				logs.ErrorPrint( "Unable to create directory: %v\n", err );
+				return;
+			}
+		}
+
+		err = os.Chdir( lOriginalArgs[1] );
+		if err != nil {
+			logs.ErrorPrint( "Unable to change directory: %v\n", err );
+			return;
+		}
 	}
 
+	// Create a new directory
+	for _, lDirName := range lConfigs.directories {
+		err := os.Mkdir( lDirName, 0755 );
+		if err != nil {
+			if os.IsExist(err) {
+				logs.WarningPrint( "Directory %s already exists. Skipping\n", lDirName );
+			} else {
+				logs.WarningPrint( "Unable to create directory %s: %v\n", lDirName, err );
+			}
+		}
+	}
+
+	// Copy all templates
 	if !lConfigs.noTemplates {
-		// for template in lConfigs.templates cp
+		for _, lTemplate := range lConfigs.templates {
+			lTitle := config.ConfigDir() + "templates/" + lTemplate.title;
+
+			if Copy( lTitle, lTemplate.destination ) {
+				logs.ErrorPrint( "Unable to copy template from %s to %s\n",
+					lTemplate.title, lTemplate.destination );
+			}
+		}
 	}
 
+	// Copy License
+	if lConfigs.license != "" {
+		lLicensePath := config.ConfigDir() + "licenses/" + lConfigs.license;
+		Copy( lLicensePath, "." );
+	}
+
+	// Run init command
+	lResult, lError := SysRun( lConfigs.command );
+	if lError {
+		logs.ErrorPrint( lResult );
+	} else  {
+		fmt.Println( lResult );
+	}
+
+	// Create git repo
 	if !lConfigs.noGit {
-		// git init
-		// cp CONFIG_DIR/ignores/language ./.gitginore
-		// git commit init: project
+		lResult, err := SysRun( "git init" );
+		if err {
+			logs.ErrorPrint( err );
+			return;
+		}
+		fmt.Println( lResult );
+
+		// write to .gitignore
+
+		lResult, err = SysRun( "git add -A" );
+		if err {
+			logs.ErrorPrint( err );
+			return;
+		}
+		fmt.Println( lResult );
+
+		lResult, err = SysRun( "git commit -m \"init: project\"" );
+		if err {
+			logs.ErrorPrint( err );
+			return;
+		}
+		fmt.Println( lResult );
 	}
 }
 

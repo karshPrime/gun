@@ -32,10 +32,10 @@ and run it the same way every time.
 - [x] Git repository initialisation
 - [x] Help command with detailed usage and logging
 - [x] Parse `init` config definitions
-- [ ] Create new project with structure and files
-- [ ] Copy license file into project
-- [ ] Copy template files into project
-- [ ] **`init` command: Completed**
+- [x] Create new project with structure and files
+- [x] Copy license file into project
+- [x] Copy template files into project
+- [x] **`init` command: Completed**
 - [ ] View/manage saved licenses
 - [ ] Replace current license
 - [ ] **License system: Completed**
