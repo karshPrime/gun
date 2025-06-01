@@ -210,15 +210,18 @@ func Trigger( aCommand Triggers ) {
 	lConfigs.parseInput();
 	lStatus := lConfigs.parseConfigs( aCommand );
 
-	if !lStatus {
-		return;
-	}
+	if !lStatus { return; }
 
 	if lConfigs.cdRoot {
-		cdRoot();
+		if !cdRoot() { return; };
 	}
 
 	// run command
-	// lTriggerConfigs.command
+	lResult, lError := sysRun( lConfigs.command );
+	if lError {
+		logs.ErrorPrint( lResult );
+		return;
+	}
+	fmt.Print( lResult );
 }
 

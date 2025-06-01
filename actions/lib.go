@@ -3,6 +3,14 @@
 
 package actions
 
+import (
+	"os"
+	"fmt"
+	"bytes"
+	"os/exec"
+	"karshPrime/gun/logs"
+)
+
 //- Defines ----------------------------------------------------------------------------------------
 
 type Triggers int;
@@ -26,19 +34,41 @@ func triggersKey( aTrigger Triggers ) string {
 	}
 }
 
-func isGitRepo() bool {
-	lIsRepo := false;
-
-	// update lIsRepo
-
-	return lIsRepo;
-}
-
-func cdRoot() {
-	if isGitRepo() {
-		// cd to git root
+func cdRoot() bool {
+	lResult, lError := sysRun( "git rev-parse --show-toplevel" );
+	if lError {
+		logs.ErrorPrint( "Project is not a git repo. Cannot cd to project root.\n" + lResult );
+		return false;
 	}
 
-	// print error
+	lErrorCD:= os.Chdir( lResult );
+    if lErrorCD != nil {
+        logs.ErrorPrint( "Unable to cd to project root.\n" + lErrorCD.Error() )
+		return false;
+    }
+
+	return true;
+}
+
+func sysRun( aCommand string ) ( Result string, Error bool ) {
+	fmt.Println( aCommand );
+	lShell, lArgs := systemShell( aCommand );
+
+	if lShell == "" {
+		return "invalid environment", true;
+	}
+
+	var lStdOut bytes.Buffer;
+	var lStdErr bytes.Buffer;
+
+	lCommand := exec.Command( lShell, lArgs... );
+	lCommand.Stdout = &lStdOut;
+	lCommand.Stderr = &lStdErr;
+
+	if lCommand.Run() != nil {
+		return lStdErr.String(), true;
+	}
+
+	return lStdOut.String(), false;
 }
 
