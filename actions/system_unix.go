@@ -1,6 +1,6 @@
+// go:build linux,darwin
 
 // actions/lib_unix.go
-// go:build linux,darwin
 
 package actions
 

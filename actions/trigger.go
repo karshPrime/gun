@@ -101,6 +101,8 @@ func ( configs *triggerConfigs ) parseInput() {
 }
 
 func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers ) bool {
+	logs.DebugPrint( "global config parse" );
+
 	lStatus := false;
 	lTriggerKey := triggersKey( aTrigger );
 	lProjectLanguage := projectLanguage();
@@ -132,6 +134,8 @@ func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger T
 }
 
 func ( configs *triggerConfigs ) localConfigParse( aTrigger Triggers, aData string ) bool {
+	logs.DebugPrint( "local parse" );
+
 	lTriggerKey := triggersKey( aTrigger );
 
 	lLines := strings.Split( string( aData ), "\n" );
@@ -164,14 +168,18 @@ func ( configs *triggerConfigs ) localConfigParse( aTrigger Triggers, aData stri
 }
 
 func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
+	logs.DebugPrint( "Parse Configs" );
+
 	lGlobalConfigFile := config.ConfigDir() + "config.toml";
 	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
 	if err != nil {
+		logs.ErrorPrint( "Unable to read global config file\n" + err.Error() );
 		return false;
 	}
 
 	lTree, err := toml.Load( string( lGlobalConfigData ));
 	if err != nil {
+		logs.ErrorPrint( "Unable to read parse config file. Check syntax\n" + err.Error() );
 		return false;
 	}
 
@@ -195,10 +203,17 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 	lData, err := os.ReadFile( lLocalConfigFile );
 	if err != nil {
 		// use global config if local commands file cant be found
+		logs.DebugPrint( "Using global config; local not found" );
 		return configs.globalConfigParse( lTree, aTrigger );
 	}
 
-	return configs.localConfigParse( aTrigger, string( lData ));
+	if !configs.localConfigParse( aTrigger, string( lData )) {
+		// use global config if local config doesn't have override for asked command
+		logs.DebugPrint( "Using global config; local doesn't override asked command" );
+		return configs.globalConfigParse( lTree, aTrigger );
+	};
+
+	return true;
 }
 
 
@@ -210,7 +225,11 @@ func Trigger( aCommand Triggers ) {
 	lConfigs.parseInput();
 	lStatus := lConfigs.parseConfigs( aCommand );
 
-	if !lStatus { return; }
+	if !lStatus {
+		logs.ErrorPrint( "No config found for "+ lConfigs.command )
+		logs.DebugPrint( "No command found" );
+		return; 
+	}
 
 	if lConfigs.cdRoot {
 		if !cdRoot() { return; };
@@ -222,6 +241,6 @@ func Trigger( aCommand Triggers ) {
 		logs.ErrorPrint( lResult );
 		return;
 	}
-	fmt.Print( lResult );
+	fmt.Println( lResult );
 }
 

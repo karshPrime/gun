@@ -1,6 +1,6 @@
+// go:build windows
 
 // actions/lib_windows.go
-// go:build windows
 
 package actions
 
