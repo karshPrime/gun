@@ -1,8 +1,9 @@
 package logs
 
 import (
-	"fmt"
 	"os"
+	"fmt"
+	"github.com/fatih/color"
 )
 
 //- Defines ----------------------------------------------------------------------------------------
@@ -38,40 +39,47 @@ type printInfo struct {
 //- Private Helpers --------------------------------------------------------------------------------
 
 func helpAll() {
+	lRed := color.New( color.FgHiRed ).SprintFunc();
+	lBlue := color.New( color.FgHiBlue ).SprintFunc();
+	lGray := color.New( color.FgHiBlack ).SprintFunc();
+	lGreen := color.New( color.FgHiGreen ).SprintFunc();
+	lYellow := color.New( color.FgHiYellow ).SprintFunc();
+	lDullGreen := color.New( color.FgGreen ).SprintFunc();
+
 	fmt.Println(
 		"\nUSAGE:",
-		"\n  $ gun [command] [flags]",
+		"\n  ", lYellow("$"), lRed("gun"), lGreen( "[command]" ), lBlue( "[flags] [arguments]" ),
 		"\n",
 		"\nCOMMANDS:",
-		"\n  run\t\t"   , aboutCommandRun,
-		"\n  build\t\t" , aboutCommandBuild,
-		"\n  init\t\t"  , aboutCommandInit,
-		"\n  debug\t\t" , aboutCommandDebug,
-		"\n  test\t\t"  , aboutCommandTest,
-		"\n  clean\t\t" , aboutCommandClean,
-		"\n  config\t"  , aboutCommandConfig,
-		"\n  template\t", aboutCommandTemplate,
-		"\n  license\t" , aboutCommandLicense,
+		lGreen( "\n  run\t\t" )   , lDullGreen( aboutCommandRun ),
+		lGreen( "\n  build\t\t" ) , lDullGreen( aboutCommandBuild ),
+		lGreen( "\n  init\t\t" )  , lDullGreen( aboutCommandInit ),
+		lGreen( "\n  debug\t\t" ) , lDullGreen( aboutCommandDebug ),
+		lGreen( "\n  test\t\t" )  , lDullGreen( aboutCommandTest ),
+		lGreen( "\n  clean\t\t" ) , lDullGreen( aboutCommandClean ),
+		lGreen( "\n  config\t" )  , lDullGreen( aboutCommandConfig ),
+		lGreen( "\n  template\t" ), lDullGreen( aboutCommandTemplate ),
+		lGreen( "\n  license\t" ) , lDullGreen( aboutCommandLicense ),
 		"\n",
 		"\nEXAMPLES:",
-		"\n  # Compile and run the program using local config",
-		"\n  $ gun",
+		lGray( "\n  # Compile and run the program using local config" ),
+		lYellow( "\n  $" ), lRed( "gun" ),
 		"\n",
-		"\n  # Run the program with '--help' argument",
-		"\n  $ gun run --help",
+		lGray( "\n  # Run the program with '--help' argument" ),
+		lYellow( "\n  $" ), lRed( "gun" ), lGreen( "run" ), lBlue( "--help" ),
 		"\n",
-		"\n  # Compile with extra flags and run with arguments",
-		"\n  $ gun \"hello world\" --flags -Wall",
+		lGray( "\n  # Compile with extra flags and run with arguments" ),
+		lYellow( "\n  $" ), lRed( "gun" ), lBlue( "\"hello world\" --flags -Wall" ),
 		"\n",
-		"\n  # Initialise a new C project using GPLv2 license",
-		"\n  $ gun init my_project c --license GPLv2",
+		lGray( "\n  # Initialise a new C project using GPLv2 license" ),
+		lYellow( "\n  $" ), lRed( "gun" ), lGreen( "init" ), lBlue( "myProject c --license GPLv2" ),
 		"\n",
-		"\n  # List all available templates",
-		"\n  $ gun template --list",
+		lGray( "\n  # List all available templates" ),
+		lYellow( "\n  $" ), lRed( "gun" ), lGreen( "template" ), lBlue( "--list" ),
 		"\n",
 		"\nNOTE:",
-		"\n  Run `$ gun help [command]` to see details, flags, and usage for a specific command.",
-		"\n  For example: `$ gun help build`",
+		lGray( "\n  Run `$ gun help [command]` to see details, flags, and usage for a specific" ),
+		lGray( "command.\n  For example: `$ gun help build`" ),
 	);
 }
 
@@ -89,6 +97,13 @@ func Help() {
 }
 
 func HelpCommand( aCommand string ) {
+	lRed := color.New( color.FgHiRed ).SprintFunc();
+	lBlue := color.New( color.FgHiBlue ).SprintFunc();
+	lGray := color.New( color.FgHiBlack ).SprintFunc();
+	lGreen := color.New( color.FgHiGreen ).SprintFunc();
+	lYellow := color.New( color.FgHiYellow ).SprintFunc();
+	lDullGreen := color.New( color.FgGreen ).SprintFunc();
+
 	var lFlags []printInfo;
 	var lExamples []printInfo;
 	var lParameters string = "[arguments] [flags]";
@@ -181,7 +196,7 @@ func HelpCommand( aCommand string ) {
 				about: "",
 				command: "",
 			}};
-			lParameters = "{project name} {project language} [flags]";
+			lParameters = "<project name> <project language> [flags]";
 
 		case "template":
 			fmt.Println( aboutCommandTemplate );
@@ -231,28 +246,31 @@ func HelpCommand( aCommand string ) {
 
 	fmt.Println(
 		"\nUSAGE:",
-		"\n  $ gun", aCommand, lParameters,
+		lYellow( "\n  $" ), lRed( "gun" ), lGreen( aCommand ), lBlue( lParameters ),
 	);
 
 	if len( lFlags ) > 0 {
 		fmt.Println( "\nFLAGS:" );
 
 		for i := range len( lFlags ) {
-			fmt.Printf( "  --%-17v %v\n", lFlags[i].command, lFlags[i].about );
+			fmt.Printf( 
+				"  %-27v %v\n",
+				lGreen( "--", lFlags[i].command ), lDullGreen( lFlags[i].about ),
+			);
 		}
 	}
 
 	fmt.Print( "\nEXAMPLES:" );
 
 	for i := range len( lExamples ) {
-		fmt.Printf(
-			"\n  # %v\n  $ gun %v %v\n",
-			lExamples[i].about , aCommand, lExamples[i].command,
+		fmt.Println(
+			lGray( "\n  # ", lExamples[i].about, "\n" ),
+			lYellow( " $" ), lRed( "gun" ), lGreen( aCommand ), lBlue( lExamples[i].command ),
 		);
 	}
 
 	if len(lNote) > 0 {
-		fmt.Println( "\nNote:\n ",  lNote );
+		fmt.Println( "\nNote:\n ",  lGray( lNote ) );
 	}
 }
 
