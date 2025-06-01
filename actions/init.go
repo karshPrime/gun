@@ -93,6 +93,7 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 		}
 
 		// Parse git_ignore
+		configs.gitIgnores = []string{ "", "# .gitignore", "" };
 		if lParsedGitIgnore := lSectionMap.Get( "git_ignore" ); lParsedGitIgnore != nil {
 			if gitIgnores, ok := lParsedGitIgnore.( []any ); ok {
 				for _, item := range gitIgnores {
@@ -263,7 +264,19 @@ func Init() {
 		}
 		fmt.Println( lResult );
 
-		// write to .gitignore
+		// .gitignore
+		file, lFileErr := os.OpenFile( ".gitignore", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644 )
+		if lFileErr != nil {
+			logs.ErrorPrint( "Unable to open or create .gitignore: %v", err );
+			return;
+		}
+		defer file.Close();
+		for _, line := range lConfigs.gitIgnores {
+			if _, err := file.WriteString(line + "\n"); err != nil {
+				logs.ErrorPrint( "Unable to write to .gitignore: %v", err );
+				return
+			}
+		}
 
 		lResult, err = SysRun( "git add -A" );
 		if err {
