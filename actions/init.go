@@ -140,6 +140,14 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 	return true;
 }
 
+func replaceCommandPlaceholders( aCommand *string, aProjectName string, aProjectLanguage string ) {
+	lScriptPath := config.ConfigDir() + "scripts/";
+
+	*aCommand = strings.Replace( *aCommand, "%PROJECT_NAME%", aProjectName, -1 );
+	*aCommand = strings.Replace( *aCommand, "%PROJECT_LANGUAGE%", aProjectLanguage, -1 );
+	*aCommand = strings.Replace( *aCommand, "%SCRIPT% ", lScriptPath, -1 );
+}
+
 
 //- Public Calls -----------------------------------------------------------------------------------
 
@@ -162,6 +170,7 @@ func Init() {
 
 	lConfigs.parseInput();
 	lConfigs.parseConfigs( lOriginalArgs[2] );
+	replaceCommandPlaceholders( &lConfigs.command, lOriginalArgs[1], lOriginalArgs[2] );
 
 	// logs.ErrorPrint( "command\t\t:", lConfigs.command )
 	// logs.ErrorPrint( "here\t\t:", lConfigs.here )

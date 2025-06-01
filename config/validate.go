@@ -26,5 +26,6 @@ func ValidateFilesystem() {
 	lCheckCreateDir( lHomeDir );
 	lCheckCreateDir( lHomeDir + "templates" )
 	lCheckCreateDir( lHomeDir + "licenses" )
+	lCheckCreateDir( lHomeDir + "scripts" )
 }
 
