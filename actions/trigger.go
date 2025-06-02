@@ -59,7 +59,7 @@ func projectLanguage() string {
 			return filepath.SkipDir; // stop search early
 		}
 		return nil
-	} )
+	})
 
 	if err != nil {
 		logs.ErrorPrint( "Unable to search for files in the directory" );
@@ -103,37 +103,51 @@ func ( configs *triggerConfigs ) parseInput() {
 func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers ) bool {
 	logs.DebugPrint( "Global config parse" );
 
-	lStatus := false;
 	lTriggerKey := triggersKey( aTrigger );
+	configs.cdRoot = true;
+
+	lReadGlobalConfig := func( aLangKey string ) int {
+		lSection := aTree.Get( aLangKey );
+		if lSection == nil {
+			return 1;
+		}
+
+		lSectionMap, ok := lSection.( *toml.Tree );
+		if !ok {
+			return 2;
+		}
+
+		lCommand := lSectionMap.Get( lTriggerKey );
+		if lCommandStr, ok := lCommand.( string ); ok {
+			configs.command = lCommandStr + " " + configs.command;
+		}
+
+		if lcdRootValue := lSectionMap.Get( "cd_root" ); lcdRootValue != nil {
+			configs.cdRoot, _ = lcdRootValue.( bool );
+		}
+
+		return 0;
+	}
+
+	// read the default [dev] defined config, and set those as values
+	lReadGlobalConfig( "dev" ); // ignore error messages
+
+	// override [dev] defines with specific defined
 	lProjectLanguage := projectLanguage();
 	lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ));
+	switch (lReadGlobalConfig( lLangKey )) {
+		case 1:
+			logs.ErrorPrint( "Config not found for ", lProjectLanguage[1:], "language" );
+			return false;
 
-	lSection := aTree.Get( lLangKey );
-	if lSection == nil {
-		logs.ErrorPrint( "Config not found for ", lProjectLanguage[1:], "language" );
-		return false;
+		case 2:
+			logs.ErrorPrint( "Unable to parse global configs for ", lProjectLanguage[1:],
+				". Check Syntax." );
+			return false;
+
+		default:
+			return true;
 	}
-
-	lSectionMap, ok := lSection.( *toml.Tree );
-	if !ok {
-		logs.ErrorPrint( "Unable to parse global configs for ", lProjectLanguage[1:],
-			". Check Syntax." );
-
-		return false;
-	}
-
-	lCommand := lSectionMap.Get( lTriggerKey );
-	if lCommandStr, ok := lCommand.( string ); ok {
-		configs.command = lCommandStr + " " + configs.command;
-		lStatus = true;
-	}
-
-	configs.cdRoot = false;
-	if lcdRootValue := lSectionMap.Get( "cd_root" ); lcdRootValue != nil {
-		configs.cdRoot, _ = lcdRootValue.( bool );
-	}
-
-	return lStatus;
 }
 
 func ( configs *triggerConfigs ) localConfigParse( aTrigger Triggers, aData string ) bool {
@@ -200,6 +214,7 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 	}
 
 	if lLocalConfigFile == "" {
+		logs.DebugPrint( "Unable to find config set in the config" )
 		lLocalConfigFile = "commands";
 	}
 

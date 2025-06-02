@@ -49,96 +49,113 @@ func ( configs *initConfigs ) parseInput() {
 func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 	logs.DebugPrint( "Parse Configs" );
 
-	lProjectLanguage := strings.ToLower( aProjectLanguage );
-	lGlobalConfigFile := config.ConfigDir() + "config.toml";
-	lLangKey := fmt.Sprintf( "init.%s", strings.TrimPrefix( lProjectLanguage, "." ));
+	// define initial list
+	configs.gitIgnores = []string{ "# .gitignore", "" };
+	configs.files = []string{ "README.md" }; // always create readme
+	configs.command = "";
 
+	// open the config.toml file
+	lGlobalConfigFile := config.ConfigDir() + "config.toml";
 	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
 	if err != nil {
 		logs.ErrorPrint( "Unable to read config file:", err );
 		return false;
 	}
 
+	// parse config.toml file as toml
 	lTree, err := toml.Load( string(lGlobalConfigData) );
 	if err != nil {
 		logs.ErrorPrint( "Unable to load TOML:", err );
 		return false;
 	}
 
-	lSection := lTree.Get( lLangKey );
-	if lSection == nil {
-		fmt.Println( "Config not found for " + lProjectLanguage + " language" );
-		return false;
-	}
-
-	lSectionMap := lSection.( *toml.Tree );
-
-	// Parse command
-	configs.command = "";
-	if lParsedCommand := lSectionMap.Get( "command" ); lParsedCommand != nil {
-		configs.command = lParsedCommand.( string );
-	}
-
-	// Parse license
-	if configs.license == "" { // i.e. it has not been overridden
-		if lParsedLicense := lSectionMap.Get( "license" ); lParsedLicense != nil {
-			configs.license = lParsedLicense.( string );
-		}
-	}
-
-	if !configs.noGit {
-		// Parse git_init
-		if lParsedGitInit := lSectionMap.Get( "git_init" ); lParsedGitInit != nil {
-			configs.noGit = !lParsedGitInit.( bool );
+	// read data from the file: get to choose what toml block to read
+	lReadGlobalConfig := func( aLangKey string ) int {
+		lSection := lTree.Get( aLangKey );
+		if lSection == nil {
+			return 1;
 		}
 
-		// Parse git_ignore
-		configs.gitIgnores = []string{ "", "# .gitignore", "" };
-		if lParsedGitIgnore := lSectionMap.Get( "git_ignore" ); lParsedGitIgnore != nil {
-			if gitIgnores, ok := lParsedGitIgnore.( []any ); ok {
-				for _, item := range gitIgnores {
-					configs.gitIgnores = append( configs.gitIgnores, item.(string) );
-				}
+		lSectionMap := lSection.( *toml.Tree );
+
+		// Parse command
+		if lParsedCommand := lSectionMap.Get( "command" ); lParsedCommand != nil {
+			configs.command = lParsedCommand.( string );
+		}
+
+		// Parse license
+		if configs.license == "" { // i.e. it has not been overridden
+			if lParsedLicense := lSectionMap.Get( "license" ); lParsedLicense != nil {
+				configs.license = lParsedLicense.( string );
 			}
 		}
-	}
 
-	// Parse templates
-	if !configs.noTemplates {
-		if lParsedTemplates, ok := lSectionMap.Get( "templates" ).( []*toml.Tree ); ok {
-			for _, tree := range lParsedTemplates {
-				if title, titleOk := tree.Get( "title" ).( string ); titleOk {
-					if destination, destOk := tree.Get( "destination" ).( string ); destOk {
-						configs.templates = append(
-							configs.templates,
-							template{ title: title, destination: destination },
-						);
+		if !configs.noGit {
+			// Parse git_init
+			if lParsedGitInit := lSectionMap.Get( "git_init" ); lParsedGitInit != nil {
+				configs.noGit = !lParsedGitInit.( bool );
+			}
+
+			// Parse git_ignore
+			if lParsedGitIgnore := lSectionMap.Get( "git_ignore" ); lParsedGitIgnore != nil {
+				if gitIgnores, ok := lParsedGitIgnore.( []any ); ok {
+					for _, item := range gitIgnores {
+						configs.gitIgnores = append( configs.gitIgnores, item.(string) );
 					}
 				}
 			}
 		}
-	}
 
-	// Parse directories
-	if lParsedDirectories := lSectionMap.Get( "directories" ); lParsedDirectories != nil {
-		if directories, ok := lParsedDirectories.( []any ); ok {
-			for _, dir := range directories {
-				configs.directories = append( configs.directories, dir.(string) );
+		// Parse templates
+		if !configs.noTemplates {
+			if lParsedTemplates, ok := lSectionMap.Get( "templates" ).( []*toml.Tree ); ok {
+				for _, tree := range lParsedTemplates {
+					if title, titleOk := tree.Get( "title" ).( string ); titleOk {
+						if destination, destOk := tree.Get( "destination" ).( string ); destOk {
+							configs.templates = append(
+								configs.templates,
+								template{ title: title, destination: destination },
+							);
+						}
+					}
+				}
 			}
 		}
-	}
 
-	// Parse files
-	configs.files = []string{ "README.md" }; // always create readme
-	if lParsedFiles := lSectionMap.Get( "files" ); lParsedFiles != nil {
-		if files, ok := lParsedFiles.( []any ); ok {
-			for _, dir := range files {
-				configs.files = append( configs.files , dir.(string) );
+		// Parse directories
+		if lParsedDirectories := lSectionMap.Get( "directories" ); lParsedDirectories != nil {
+			if directories, ok := lParsedDirectories.( []any ); ok {
+				for _, dir := range directories {
+					configs.directories = append( configs.directories, dir.(string) );
+				}
 			}
 		}
+
+		// Parse files
+		if lParsedFiles := lSectionMap.Get( "files" ); lParsedFiles != nil {
+			if files, ok := lParsedFiles.( []any ); ok {
+				for _, dir := range files {
+					configs.files = append( configs.files , dir.(string) );
+				}
+			}
+		}
+		return 0;
 	}
 
-	return true;
+	// read the default [init] defined config, and set those as values
+	lReadGlobalConfig( "init" ); // ignore error messages
+
+	// override [init] defines with specific defined
+	lProjectLanguage := strings.ToLower( aProjectLanguage );
+	lLangKey := fmt.Sprintf( "init.%s", strings.TrimPrefix( lProjectLanguage, "." ));
+	switch ( lReadGlobalConfig( lLangKey )) {
+		case 1:
+			logs.ErrorPrint( "Config not found for " + lProjectLanguage + " language" );
+			return false;
+
+		default:
+			return true;
+	}
 }
 
 func replaceCommandPlaceholders( aCommand *string, aProjectName string, aProjectLanguage string ) {

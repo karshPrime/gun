@@ -1,66 +1,97 @@
 
+# Example Configuration File
+
 [local]
 copy_config  = true
-config_title = ".dev.toml"
-
-[repository]
-git_username = ""
-git_hostname = "github.com"
-git_ssh      = false
-git_commit   = "init: project"
+config_title = "command"
 
 
-#- C/C++ Config ----------------------------------------------------------------
+#- Default Configs ---------------------------------------------------------------------------------
 
-[dev.cxx]
-extensions  = [ "c", "cpp", "h" ]
-cd_root     = true
+[init]
+license    = "GPLv2"
+git_init   = true
+git_ignore = [ "**/.DS_Store", "**/todo", "" ]
+
+[dev]
+cd_root    = true
+
+
+#---------------------------------------------------------------------------------------------------
+#- C Config ----------------------------------------------------------------------------------------
+
+[init.c]
+command     = "%SCRIPT% cmakegenerate.sh %PROJECT_NAME% c; ln -s ./build/src/%PROJECT_NAME% ./bin"
+directories = [ "src", "include", "build", "lib" ]
+templates   = [
+    { title = "main.c", destination = "src/main.c" },
+    { title = "debugs/c.h", destination = "include/debug.h" },
+]
+git_ignore  = [ ".cache/", "build/", "obj/" ]
+
+
+[dev.c]
 build       = "cmake -S . -B build && cmake --build build"
-run         = "cmake -S . -B build && cmake --build build; ./bin"
-clean       = "rm -rf build/*"
+run         = "./bin"
+clean       = "rm -rf ./build/*"
 debug       = "lldb"
 
 
-[init.c]
-command     = "ln -s './build/src/%PROJECT' './bin'"
-license     = "Apache2"
-directories = [ "src", "include", "build", "lib" ]
-templates   = [
-    { title = "c_main.c",  destination = "src/main.c" },
-    { title = "c_debug.h", destination = "include/debug.h" },
-]
-git_ignore  = [ "**/.DS_Store", "**/todo", ".cache/", "build/", "obj/" ]
-git_init    = true
-
+#- C++ Config --------------------------------------------------------------------------------------
 
 [init.cpp]
-command     = "ln -s './build/src/%PROJECT' './bin'"
-license     = "Apache2"
+command     = "%SCRIPT% cmakegenerate.sh %PROJECT_NAME% cpp; ln -s ./build/src/%PROJECT_NAME% ./bin"
 directories = [ "src", "include", "build", "lib" ]
 templates   = [
-    { title = "main.cpp",  destination = "src/main.cpp" },
-    { title = "cpp_debug.h", destination = "include/debug.h" },
+    { title = "main.cpp", destination = "src/main.cpp" },
+    { title = "debugs/cpp.h", destination = "include/debug.h" },
 ]
-git_ignore  = [ "**/.DS_Store", "**/todo", ".cache/", "build/", "obj/" ]
-git_init    = true
+git_ignore  = [ ".cache/", "build/", "obj/" ]
 
 
-#- Python Config ---------------------------------------------------------------
+[dev.cpp]
+build       = "cmake -S . -B build && cmake --build build"
+run         = "./bin"
+clean       = "rm -rf ./build/*"
+debug       = "lldb"
 
-[dev.py]
-extensions  = [ "py" ]
-cd_root     = true
-run         = "py main.py"
-test        = "py test.py"
-clean       = "rm -rf __pycache__/"
+
+#- Python Config -----------------------------------------------------------------------------------
 
 [init.py]
-command     = "python -m venv ./.pyenv; source ./.pyenv/bin/activate"
-license     = "MIT"
-files       = "requirements.txt"
+command     = "python3 -m venv ./.pyenv"
+files       = [ "requirements.txt", "test.py" ]
+directories = [ "scripts" ]
 templates   = [
-    { title = "py_main.py",  destination = "main.py" },
+    { title = "main.py",  destination = "main.py" },
 ]
-git_ignore  = [ "**/.DS_Store", "**/todo", ".pyenv/", "__pycache__/" ]
-git_init    = true
+git_ignore  = [ ".pyenv/", "__pycache__/" ]
+
+
+[dev.py]
+run         = "python3 main.py"
+test        = "python3 test.py"
+clean       = "rm -rf __pycache__/"
+
+
+#- Go Config ---------------------------------------------------------------------------------------
+
+[init.go]
+command     = "go mod init \"github.com/karshPrime/%PROJECT_NAME%\"; go mod tidy"
+directories = [ "cmd" ]
+templates   = [
+    { title = "main.go", destination = "main.go" },
+    { title = "debugs/go-logs", destination = "logs/" },
+]
+git_ignore  = [ "go.sum", "go.mod", "%PROJECT_NAME%" ]
+
+
+[dev.go]
+build       = "go build ."
+run         = "go run ."
+clean       = "go clean"
+test        = "go test"
+debug       = "lldb"
+
+#---------------------------------------------------------------------------------------------------
 
