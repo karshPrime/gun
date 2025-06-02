@@ -23,7 +23,7 @@ func BuildRun( aOriginalArgs []string ) {
 
 	// set build args as os.Args
 	os.Args = lBuildArgs;
-	Trigger( BUILD );
+	Trigger( BUILD, false );
 
 	// set run flags as os.Args
 	os.Args = lRunArgs;

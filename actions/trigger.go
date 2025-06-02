@@ -222,14 +222,16 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 
 //- Public Calls -----------------------------------------------------------------------------------
 
-func Trigger( aCommand Triggers ) {
+func Trigger( aCommand Triggers, aPrintError ...bool ) {
 	var lConfigs triggerConfigs;
 
 	lConfigs.parseInput();
 	lStatus := lConfigs.parseConfigs( aCommand );
 
 	if !lStatus {
-		logs.ErrorPrint( "Config not found for ",  triggersKey(aCommand), "command" );
+		if len( aPrintError ) ==  0 || aPrintError[0] {
+			logs.ErrorPrint( "Config not found for ",  triggersKey(aCommand), "command" );
+		}
 		return; 
 	}
 
