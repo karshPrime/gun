@@ -72,7 +72,6 @@ func projectLanguage() string {
 	}
 
 	logs.ErrorPrint( "Unable to find project language" );
-	os.Exit( 1 );
 	return "";
 }
 
@@ -100,7 +99,7 @@ func ( configs *triggerConfigs ) parseInput() {
 	}
 }
 
-func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers ) bool {
+func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers, aLanguage string ) bool {
 	logs.DebugPrint( "Global config parse" );
 
 	lTriggerKey := triggersKey( aTrigger );
@@ -133,15 +132,14 @@ func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger T
 	lReadGlobalConfig( "dev" ); // ignore error messages
 
 	// override [dev] defines with specific defined
-	lProjectLanguage := projectLanguage();
-	lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( lProjectLanguage, "." ));
+	lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( aLanguage, "." ));
 	switch (lReadGlobalConfig( lLangKey )) {
 		case 1:
-			logs.ErrorPrint( "Config not found for ", lProjectLanguage[1:], "language" );
+			logs.ErrorPrint( "Config not found for ", aLanguage[1:], "language/framework" );
 			return false;
 
 		case 2:
-			logs.ErrorPrint( "Unable to parse global configs for ", lProjectLanguage[1:],
+			logs.ErrorPrint( "Unable to parse global configs for ", aLanguage[1:],
 				". Check Syntax." );
 			return false;
 
@@ -184,8 +182,15 @@ func ( configs *triggerConfigs ) localConfigParse( aTrigger Triggers, aData stri
 	return lStatus;
 }
 
-func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
+func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers, aLanguage ...string ) bool {
 	logs.DebugPrint( "Parse Configs" );
+
+	var lProjectLanguage string;
+	if len( aLanguage ) == 0	 {
+		lProjectLanguage = projectLanguage();
+	} else  {
+		lProjectLanguage = "."+aLanguage[0];
+	}
 
 	lGlobalConfigFile := config.ConfigDir() + "config.toml";
 	lGlobalConfigData, err := os.ReadFile( lGlobalConfigFile );
@@ -201,7 +206,7 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 	}
 
 	if configs.global {
-		return configs.globalConfigParse( lTree, aTrigger );
+		return configs.globalConfigParse( lTree, aTrigger, lProjectLanguage );
 	}
 
 	lLocalConfigFile := "";
@@ -222,13 +227,13 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers ) bool {
 	if err != nil {
 		// use global config if local commands file cant be found
 		logs.DebugPrint( "Using global config; local not found" );
-		return configs.globalConfigParse( lTree, aTrigger );
+		return configs.globalConfigParse( lTree, aTrigger, lProjectLanguage );
 	}
 
 	if !configs.localConfigParse( aTrigger, string( lData )) {
 		// use global config if local config doesn't have override for asked command
 		logs.DebugPrint( "Using global config; local doesn't override asked command" );
-		return configs.globalConfigParse( lTree, aTrigger );
+		return configs.globalConfigParse( lTree, aTrigger, lProjectLanguage );
 	};
 
 	return true;

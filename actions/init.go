@@ -32,6 +32,8 @@ type initConfigs struct {
 	templates	[]template;
 	directories	[]string;
 	files		[]string;
+	copyConfig	bool;
+	localConfig string;
 };
 
 
@@ -67,6 +69,27 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 	if err != nil {
 		logs.ErrorPrint( "Unable to load TOML:", err );
 		return false;
+	}
+
+	lReadCopyActions := func() {
+		lSection := lTree.Get( "local" );
+		if lSection == nil {
+			return;
+		}
+
+		lSectionMap := lSection.( *toml.Tree );
+
+		// Copy Config
+		configs.copyConfig = false;
+		if lParsedCommand := lSectionMap.Get( "copy_config" ); lParsedCommand != nil {
+			configs.copyConfig = lParsedCommand.( bool );
+
+			if lParsedCommand := lSectionMap.Get( "config_title" ); lParsedCommand != nil {
+				configs.localConfig = lParsedCommand.( string );
+			} else  {
+				configs.localConfig = "commands";
+			}
+		}
 	}
 
 	// read data from the file: get to choose what toml block to read
@@ -122,6 +145,9 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 			}
 		}
 
+		// Parse file copy action
+		lReadCopyActions();
+
 		// Parse directories
 		if lParsedDirectories := lSectionMap.Get( "directories" ); lParsedDirectories != nil {
 			if directories, ok := lParsedDirectories.( []any ); ok {
@@ -158,12 +184,14 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 	}
 }
 
-func replaceCommandPlaceholders( aCommand *string, aProjectName string, aProjectLanguage string ) {
+func replaceConfigPlaceholders( aString *string, aProjectName string, aProjectLang string ) {
 	lScriptPath := config.ConfigDir() + "scripts/";
 
-	*aCommand = strings.Replace( *aCommand, "%PROJECT_NAME%", aProjectName, -1 );
-	*aCommand = strings.Replace( *aCommand, "%PROJECT_LANGUAGE%", aProjectLanguage, -1 );
-	*aCommand = strings.Replace( *aCommand, "%SCRIPT% ", lScriptPath, -1 );
+	logs.DebugPrint(  *aString,  aProjectName, aProjectLang );
+
+	*aString = strings.Replace( *aString, "%PROJECT_NAME%", aProjectName, -1 );
+	*aString = strings.Replace( *aString, "%PROJECT_LANGUAGE%", aProjectLang, -1 );
+	*aString = strings.Replace( *aString, "%SCRIPT% ", lScriptPath, -1 );
 }
 
 
@@ -188,7 +216,7 @@ func Init() {
 
 	lConfigs.parseInput();
 	lConfigs.parseConfigs( lOriginalArgs[2] );
-	replaceCommandPlaceholders( &lConfigs.command, lOriginalArgs[1], lOriginalArgs[2] );
+	replaceConfigPlaceholders( &lConfigs.command, lOriginalArgs[1], lOriginalArgs[2]);
 
 	// logs.ErrorPrint( "command\t\t:", lConfigs.command )
 	// logs.ErrorPrint( "here\t\t:", lConfigs.here )
@@ -204,7 +232,7 @@ func Init() {
 		err := os.Mkdir( lOriginalArgs[1], 0755 );
 		if err != nil {
 			if os.IsExist(err) {
-				logs.ErrorPrint("Project directory already exists" );
+				logs.ErrorPrint( "Project directory already exists" );
 				return;
 			} else {
 				logs.ErrorPrint( "Unable to create directory: %v", err );
@@ -216,6 +244,32 @@ func Init() {
 		if err != nil {
 			logs.ErrorPrint( "Unable to change directory: %v", err );
 			return;
+		}
+	}
+
+	// Copy dev commands into command
+	if lConfigs.copyConfig {
+		lAllCommands := []Triggers{ RUN, BUILD, TEST, DEBUG, CLEAN };
+		var lTConfig triggerConfigs;
+		var lOutputText []string;
+
+		for _, cmd := range lAllCommands {
+			lTConfig.parseConfigs( cmd, lOriginalArgs[2] );
+
+			if lTConfig.command != "" {
+				lOutputText = append(lOutputText, fmt.Sprintf(
+					"\t%-6s = '%s',", triggersKey(cmd), strings.TrimSpace(lTConfig.command),
+				));
+
+				lTConfig.command = "";
+			}
+		}
+
+		lFileContent := "\nreturn {\n" + strings.Join( lOutputText, "\n" ) + "\n}\n\n";
+
+		err := os.WriteFile( lConfigs.localConfig, []byte(lFileContent), 0644 )
+		if err != nil {
+			logs.ErrorPrint( "Unable to copy dev commands to local file", err );
 		}
 	}
 
@@ -233,6 +287,7 @@ func Init() {
 
 	// Create new files
 	for _, lFileName := range lConfigs.files {
+		replaceConfigPlaceholders( &lFileName, lOriginalArgs[1], lOriginalArgs[2] );
 		file, err := os.Create( lFileName );
 		if err != nil {
 			if os.IsExist(err) {
@@ -289,7 +344,8 @@ func Init() {
 		}
 		defer file.Close();
 		for _, line := range lConfigs.gitIgnores {
-			if _, err := file.WriteString(line + "\n"); err != nil {
+			replaceConfigPlaceholders( &line, lOriginalArgs[1], lOriginalArgs[2] );
+			if _, err := file.WriteString( line + "\n" ); err != nil {
 				logs.ErrorPrint( "Unable to write to .gitignore: %v", err );
 				return
 			}
