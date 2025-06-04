@@ -21,7 +21,7 @@ cd_root    = true
 #- C Config ----------------------------------------------------------------------------------------
 
 [init.c]
-command     = "%SCRIPT% cmakegenerate.sh %PROJECT_NAME% c; ln -s ./build/src/%PROJECT_NAME% ./bin"
+command     = "%SCRIPT% cmakegenerate.sh %PROJECT_NAME% c"
 directories = [ "src", "include", "build", "lib" ]
 templates   = [
     { title = "main.c", destination = "src/main.c" },
@@ -38,22 +38,6 @@ debug       = "lldb"
 
 
 #- C++ Config --------------------------------------------------------------------------------------
-
-[init.cpp]
-command     = "%SCRIPT% cmakegenerate.sh %PROJECT_NAME% cpp; ln -s ./build/src/%PROJECT_NAME% ./bin"
-directories = [ "src", "include", "build", "lib" ]
-templates   = [
-    { title = "main.cpp", destination = "src/main.cpp" },
-    { title = "debugs/cpp.h", destination = "include/debug.h" },
-]
-git_ignore  = [ ".cache/", "build/", "obj/" ]
-
-
-[dev.cpp]
-build       = "cmake -S . -B build && cmake --build build"
-run         = "./bin"
-clean       = "rm -rf ./build/*"
-debug       = "lldb"
 
 
 #- Python Config -----------------------------------------------------------------------------------
