@@ -5,9 +5,8 @@
 package actions
 
 func systemShell( aCommand string ) ( string, []string ) {
-	lShell := "sh";
-	lArgs  := []string{ "-c", aCommand };
-
+	lShell := "cmd.exe";
+	lArgs  := []string{ "/C", aCommand };
 	return lShell, lArgs;
 }
 
