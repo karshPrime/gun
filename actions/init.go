@@ -202,7 +202,7 @@ func Init() {
 
 	if len( os.Args ) < 3 {
 		logs.ErrorPrint( "Missing required arguments" );
-		fmt.Println("");
+		fmt.Println(".");
 		logs.HelpCommand( "init" );
 
 		return;
@@ -233,9 +233,11 @@ func Init() {
 		if err != nil {
 			if os.IsExist(err) {
 				logs.ErrorPrint( "Project directory already exists" );
+				fmt.Println( "." );
 				return;
 			} else {
 				logs.ErrorPrint( "Unable to create directory: %v", err );
+				fmt.Println( "." );
 				return;
 			}
 		}
@@ -243,6 +245,7 @@ func Init() {
 		err = os.Chdir( lOriginalArgs[1] );
 		if err != nil {
 			logs.ErrorPrint( "Unable to change directory: %v", err );
+			fmt.Println( "." );
 			return;
 		}
 	}
@@ -325,7 +328,7 @@ func Init() {
 	} else if lError {
 		logs.ErrorPrint( lResult );
 	} else  {
-		fmt.Println( lResult );
+		fmt.Fprintln( os.Stderr, lResult );
 	}
 
 	// Create git repo
@@ -333,37 +336,39 @@ func Init() {
 		lResult, err := SysRun( "git init" );
 		if err {
 			logs.ErrorPrint( err );
-			return;
+			goto FinishInit;
 		}
-		fmt.Println( lResult );
+		fmt.Fprintln( os.Stderr, lResult );
 
 		// .gitignore
 		file, lFileErr := os.OpenFile( ".gitignore", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644 )
 		if lFileErr != nil {
 			logs.ErrorPrint( "Unable to open or create .gitignore: %v", err );
-			return;
+			goto FinishInit;
 		}
 		defer file.Close();
 		for _, line := range lConfigs.gitIgnores {
 			replaceConfigPlaceholders( &line, lOriginalArgs[1], lOriginalArgs[2] );
 			if _, err := file.WriteString( line + "\n" ); err != nil {
-				logs.ErrorPrint( "Unable to write to .gitignore: %v", err );
-				return
+				goto FinishInit;
 			}
 		}
 
 		lResult, err = SysRun( "git add -A" );
 		if err {
 			logs.ErrorPrint( err );
-			return;
+			goto FinishInit;
 		}
 
 		lResult, err = SysRun( "git commit -m \"init: project\"" );
 		if err {
 			logs.ErrorPrint( err );
-			return;
+			goto FinishInit;
 		}
-		fmt.Println( lResult );
+		fmt.Fprintln( os.Stderr, lResult );
 	}
+
+	FinishInit:
+	fmt.Println( "./" + strings.ReplaceAll(lOriginalArgs[1], " ", "\\ " ) );
 }
 
