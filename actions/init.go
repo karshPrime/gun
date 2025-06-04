@@ -265,7 +265,8 @@ func Init() {
 			}
 		}
 
-		lFileContent := "\nreturn {\n" + strings.Join( lOutputText, "\n" ) + "\n}\n\n";
+		lFileContent := "\n--" + config.GunURL + "\n\nreturn {\n" +
+			strings.Join( lOutputText, "\n" ) + "\n}\n\n";
 
 		err := os.WriteFile( lConfigs.localConfig, []byte(lFileContent), 0644 )
 		if err != nil {
