@@ -93,10 +93,10 @@ func Help() {
 		return;
 	}
 
-	HelpCommand( os.Args[1] );
+	HelpCommand( os.Args[1], true );
 }
 
-func HelpCommand( aCommand string ) {
+func HelpCommand( aCommand string, aPrintAbout bool ) {
 	lRed := color.New( color.FgHiRed ).SprintFunc();
 	lBlue := color.New( color.FgHiBlue ).SprintFunc();
 	lGray := color.New( color.FgHiBlack ).SprintFunc();
@@ -104,6 +104,7 @@ func HelpCommand( aCommand string ) {
 	lYellow := color.New( color.FgHiYellow ).SprintFunc();
 	lDullGreen := color.New( color.FgGreen ).SprintFunc();
 
+	var lAbout string;
 	var lFlags []printInfo;
 	var lExamples []printInfo;
 	var lParameters string = "[arguments] [flags]";
@@ -111,7 +112,7 @@ func HelpCommand( aCommand string ) {
 
 	switch ( aCommand ) {
 		case "run":
-			fmt.Println( aboutCommandRun );
+			lAbout = aboutCommandRun;
 			lParameters = "[arguments]";
 			lExamples = []printInfo{{
 				about: "Run the last compiled Go program",
@@ -125,7 +126,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "build":
-			fmt.Println( aboutCommandBuild );
+			lAbout = aboutCommandBuild;
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -141,7 +142,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "debug":
-			fmt.Println( aboutCommandDebug );
+			lAbout = aboutCommandDebug;
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -154,7 +155,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "test":
-			fmt.Println( aboutCommandTest );
+			lAbout = aboutCommandTest;
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -167,7 +168,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "clean":
-			fmt.Println( aboutCommandClean );
+			lAbout = aboutCommandClean;
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -185,7 +186,7 @@ func HelpCommand( aCommand string ) {
 
 
 		case "init":
-			fmt.Println( aboutCommandInit );
+			lAbout = aboutCommandInit;
 			lFlags = []printInfo{
 				{ about: aboutFlagHere,        command: "here" },
 				{ about: aboutFlagNoGit,       command: "no-git" },
@@ -199,7 +200,7 @@ func HelpCommand( aCommand string ) {
 			lParameters = "<project name> <project language> [flags]";
 
 		case "template":
-			fmt.Println( aboutCommandTemplate );
+			lAbout = aboutCommandTemplate;
 			lFlags = []printInfo{
 				{ about: aboutFlagList+"template", command: "list" },
 				{ about: aboutFlagPrintDir, command:"print-dir" },
@@ -213,7 +214,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "config":
-			fmt.Println( aboutCommandConfig );
+			lAbout = aboutCommandConfig;
 			lFlags = []printInfo{
 				{ about: aboutFlagLocal, command: "local" },
 			};
@@ -226,7 +227,7 @@ func HelpCommand( aCommand string ) {
 			}};
 
 		case "license":
-			fmt.Println( aboutCommandLicense );
+			lAbout = aboutCommandLicense;
 			lFlags = []printInfo{
 				{ about: aboutFlagList+"license",     command: "list" },
 				{ about: aboutFlagPrintDir, command: "print-dir" },
@@ -242,6 +243,10 @@ func HelpCommand( aCommand string ) {
 			ErrorPrint( "Invalid Command ", aCommand );
 			helpAll();
 			return;
+	}
+
+	if aPrintAbout {
+		fmt.Println( lAbout );
 	}
 
 	fmt.Println(

@@ -45,6 +45,10 @@ func ( configs *initConfigs ) parseInput() {
 	flag.BoolVar( &configs.noTemplates, "no-templates", false, helpHere );
 	flag.StringVar( &configs.license, "license", "", helpLicense );
 
+	flag.Usage = func() {
+		logs.HelpCommand( "init", false );
+	};
+
 	flag.Parse();
 }
 
@@ -203,7 +207,7 @@ func Init() {
 	if len( os.Args ) < 3 {
 		logs.ErrorPrint( "Missing required arguments" );
 		fmt.Println(".");
-		logs.HelpCommand( "init" );
+		logs.HelpCommand( "init", false );
 
 		return;
     }
