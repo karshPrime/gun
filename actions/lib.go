@@ -141,10 +141,12 @@ func SysRun( aCommand string ) ( Result string, Error bool ) {
 	lCommand.Stderr = &lStdErr;
 
 	if lCommand.Run() != nil {
-		return strings.TrimSpace( lStdErr.String() ) + strings.TrimSpace( lStdOut.String() ), true;
+		return strings.TrimSuffix( lStdErr.String(), "\n" ) +
+			strings.TrimSuffix( lStdOut.String(), "\n" ), true;
 	}
 
-	return strings.TrimSpace( lStdErr.String() ) + strings.TrimSpace( lStdOut.String() ), false;
+	return strings.TrimSuffix( lStdErr.String(), "\n" ) +
+		strings.TrimSuffix( lStdOut.String(), "\n" ), false;
 }
 
 func Copy( aSource string, aDestination string) ( fail bool ) {

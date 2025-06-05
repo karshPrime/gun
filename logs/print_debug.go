@@ -1,4 +1,4 @@
-// +build !NDEBUG
+// +build DEBUG
 
 // logs/print.go
 

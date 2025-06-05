@@ -1,0 +1,11 @@
+
+-- https://github.com/karshPrime/gun
+
+return {
+	run     = '',
+	build   = 'go build .; figlet "Compiled"',
+	test    = 'go build -tags DEBUG .; figlet "Compiled"',
+	clean   = 'go clean',
+	cd_root = true,
+}
+
