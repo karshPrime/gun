@@ -261,10 +261,11 @@ func Trigger( aCommand Triggers, aPrintError ...bool ) {
 
 	// run command
 	lResult, lError := SysRun( lConfigs.command );
-	if lError {
+	if lResult == "" {
+	} else if lError {
 		logs.ErrorPrint( lResult );
-		return;
+	} else {
+		fmt.Println( lResult );
 	}
-	fmt.Println( lResult );
 }
 

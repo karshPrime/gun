@@ -3,12 +3,15 @@ package main
 
 import (
 	"os"
+	"fmt"
 	"karshPrime/gun/actions"
 	"karshPrime/gun/config"
 	"karshPrime/gun/licenses"
 	"karshPrime/gun/logs"
 	"karshPrime/gun/templates"
 )
+
+const VERSION = "0.1.0";
 
 func main() {
 	config.ValidateFilesystem();
@@ -29,10 +32,12 @@ func main() {
 		case "t", "test"  : actions.Trigger( actions.TEST  );
 
 		case "i", "init" : actions.Init();
-		case "h", "help", "--help", "-h" : logs.Help();
 
 		case "T", "template" : templates.Template();
 		case "l", "license"  : licenses.License();
+
+		case "h", "help", "--help", "-h" 	   : logs.Help();
+		case "v", "version", "--version", "-v" : fmt.Println( "Version:", VERSION );
 
 		default:
 			actions.BuildRun( lOriginalArgs );

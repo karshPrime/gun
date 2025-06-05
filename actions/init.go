@@ -20,7 +20,7 @@ const helpLicense = "State what license to use"
 type template struct {
 	title		string;
 	destination	string;
-}
+};
 
 type initConfigs struct {
 	here		bool;
@@ -261,14 +261,16 @@ func Init() {
 
 			if lTConfig.command != "" {
 				lOutputText = append(lOutputText, fmt.Sprintf(
-					"\t%-6s = '%s',", triggersKey(cmd), strings.TrimSpace(lTConfig.command),
+					"\t%-7s = '%s',", triggersKey(cmd), strings.TrimSpace(lTConfig.command),
 				));
 
 				lTConfig.command = "";
 			}
 		}
 
-		lFileContent := "\n--" + config.GunURL + "\n\nreturn {\n" +
+		lOutputText = append( lOutputText, fmt.Sprintf( "\tcd_root = %t,", lTConfig.cdRoot ) );
+
+		lFileContent := "\n-- " + config.GunURL + "\n\nreturn {\n" +
 			strings.Join( lOutputText, "\n" ) + "\n}\n\n";
 
 		err := os.WriteFile( lConfigs.localConfig, []byte(lFileContent), 0644 )
