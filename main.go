@@ -41,7 +41,7 @@ func main() {
 		case "T", "template" : templates.Template();
 		case "l", "license"  : licenses.License();
 
-		case "h", "help", "--help", "-h" 	   : logs.Help();
+		case "h", "help", "--help", "-h"	   : logs.Help();
 		case "v", "version", "--version", "-v" : fmt.Println( "Version:", VERSION );
 
 		default:
