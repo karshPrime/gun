@@ -27,6 +27,7 @@ type initConfigs struct {
 	command		string;
 	license		string;
 	noGit		bool;
+	gitMessage	string;
 	gitIgnores	[]string;
 	noTemplates bool;
 	templates	[]template;
@@ -121,6 +122,13 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 			// Parse git_init
 			if lParsedGitInit := lSectionMap.Get( "git_init" ); lParsedGitInit != nil {
 				configs.noGit = !lParsedGitInit.( bool );
+			}
+
+			// Parse git init commit message
+			if lParsedGitMsg := lSectionMap.Get( "git_message" ); lParsedGitMsg != nil {
+				configs.gitMessage = lParsedGitMsg.( string );
+			} else {
+				configs.gitMessage = "init: project";
 			}
 
 			// Parse git_ignore
@@ -366,8 +374,10 @@ func Init() {
 			goto FinishInit;
 		}
 
-		lResult, err = SysRun( "git commit -m \"init: project\"" );
+		replaceConfigPlaceholders( &lConfigs.gitMessage, lOriginalArgs[1], lOriginalArgs[2] );
+		lResult, err = SysRun( "git commit -m \"" + lConfigs.gitMessage + "\"" );
 		if err {
+			logs.DebugPrint( "git commit -m \"" + lConfigs.gitMessage + "\"" );
 			logs.ErrorPrint( err );
 			goto FinishInit;
 		}

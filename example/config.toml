@@ -12,6 +12,7 @@ config_title = "command"
 license    = "GPLv2"
 git_init   = true
 git_ignore = [ "**/.DS_Store", "**/todo", "" ]
+git_message= "init %PROJECT_NAME% project"
 
 [dev]
 cd_root    = true
