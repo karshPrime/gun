@@ -226,6 +226,7 @@ func Init() {
 	// lOriginalArgs[1] = project name
 	// lOriginalArgs[2] = project language
 
+
 	lConfigs.parseInput();
 	lConfigs.parseConfigs( lOriginalArgs[2] );
 	replaceConfigPlaceholders( &lConfigs.command, lOriginalArgs[1], lOriginalArgs[2]);
@@ -266,6 +267,7 @@ func Init() {
 	if lConfigs.copyConfig {
 		lAllCommands := []Triggers{ RUN, BUILD, TEST, DEBUG, CLEAN };
 		var lTConfig triggerConfigs;
+		lTConfig.global = true;
 		var lOutputText []string;
 
 		for _, cmd := range lAllCommands {
