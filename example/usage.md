@@ -1,47 +1,153 @@
+# gun Usage
 
-$ gun
-    --flags [Flags]                     Specify optional build flags
-    --args  [Args]                      Specify optional run arguments
-    --global                            Build and Run the program with globally defined config, override local config
+## Without Parameters
+Gun compiles the program and runs it, using `build` and `run` defined in the local `./commands`
+file, and if not found, then defaults defined in `config.toml`.
+```console
+$ gun [run args]
 
-$ gun init [ProjectName] [Language]
-    --here                              Create project in current directory, instead of mkdir
-    --license [Title]                   State what license to use
-    --no-git                            Not initialise as git repository
-    --no-templates                      Dont add any or all template to the project
+FLAGS:
+  --flags [Flags]    Specify optional build flags
+  --global           Run the command using the global config, overriding the local config
+```
 
-$ gun template
-    --list                              List all template files
-    --print-dir                         Print the location of where the templates are stored
-    --new [Title]                       Create new template file with the given title
-    --add [Templates]                   Add templates code to current project
-    --manage                            Manage the record of all saved templates
+## Init
+Initiate a new project with templates, licensing, and a structured layout. The data flow of the command proceeds as follows:
+- `config.toml` is read and all configs are loaded.
+- If the `--here` flag is not specified, a new directory is created, and gun cd into it.
+- Unless `copy_config` is set to false, all defined [xxx.dev] commands are copied from the local `./commands` file.
+- All specified `directories` are created.
+- All designated `files` are created.
+- All defined `templates` are copied over.
+- The specified `license` file is copied.
+- The designated `command` is executed.
+- A Git repository is initialised.
+- The `.gitignore` file is generated.
+- A Git commit is made with the specified `git_message`
+```console
+$ gun init <project name> <project language> [flags]
 
-$ gun license
-    --list                              List all saved licenses
-    --print-dir                         Print the location of where the licenses are stored
-    --new [Title]                       Create new license file with the given title
-    --replace [Title]                   Replace the current license with new one
+FLAGS:
+  --here             Create the project in the current dir, instead of making a new one
+  --no-git           Create the project but not git repository
+  --no-templates     Do not copy any config defined templates to the project
+  --license [title]  Use the specified license for the project instead of the config defined
+```
 
-$ gun run {Args}                        Run the program with passed optional arguments
-    --global                            Run the program with globally defined config, override local config
+## Template
+Manage project templates (add, create, list)
+```console
+$ gun template [arguments] [flags]
 
-$ gun build {Flags}                   Compile the program with passed optional flags
-    --global                            Compile the program with globally defined config, override local config
+FLAGS:
+  --list             List all saved template
+  --print-dir        Directory where all files are saved
+  --new [title]      Create a new template
+  --add [title]      Add a saved template to the current project
+  --manage           Manage all saved templates
+```
 
-$ gun clean                             Clean the build files
-    --global                            Clean the program with globally defined config, override local config
+## License
+Manage license files (create, replace, list)
+```console
+$ gun license [arguments] [flags]
 
-$ gun debug                             Run project specific debugger
-    --global                            Run the debugger defined in the with global config, override local config
+FLAGS:
+  --list             List all saved license
+  --print-dir        Directory where all files are saved
+  --new [title]      Create a new license
+  --replace [title]  Replace the current license with a new one
 
-$ gun test                              Run the test files
-    --global                            Run the test defined in the with global config, override local config
+```
 
-$ gun help {command}                    Print this help menu
+## Run
+Run the program with optional arguments.
+```console
+$ gun run [arguments]
 
-$ gun version                           Print utility version
+EXAMPLES:
+  # Run the last compiled Go program
+  $ gun run
 
-$ gun config
-    --local                             Edit (if existing or create) local config file
+  # Run the last compiled C program
+  $ gun run
+
+  # Run the last compiled program with `"hello world" 1234` passed as arguments
+  $ gun run "hello world" 1234
+```
+
+## Build
+Compile the program with optional flags.
+```console
+$ gun build [arguments] [flags]
+
+FLAGS:
+  --global           Run the command using the global config, overriding the local config
+
+```
+
+## Clean
+The command to clean project build files.
+```console
+$ gun clean [arguments] [flags]
+
+FLAGS:
+  --global           Run the command using the global config, overriding the local config
+
+EXAMPLES:
+  # Clean the project
+  $ gun clean
+
+  # Clean the project as defined in global config
+  $ gun clean --global
+
+```
+
+## Debug
+Run the configured debugger for the project.
+```console
+$ gun debug [arguments] [flags]
+
+FLAGS:
+  --global           Run the command using the global config, overriding the local config
+
+EXAMPLES:
+  # Run the set debugger for the project
+  $ gun debug
+
+  # Run the default debugger with `-batch -ex "run" -ex "bt"` arguments
+  $ gun debug -batch -ex "run" -ex "bt" --global
+```
+
+## Test
+Run the test suite.
+```console
+$ gun test [arguments] [flags]
+
+FLAGS:
+  --global           Run the command using the global config, overriding the local config
+
+EXAMPLES:
+  # Run the defined test suite
+  $ gun test
+
+  # Run the global defined test suit with `"foo" "bar"` arguments
+  $ gun test foo bar --global
+```
+
+## Config
+Edit or create a local project configuration file
+```console
+$ gun config [arguments] [flags]
+
+FLAGS:
+  --local            Edit the local config file instead of the global one
+
+EXAMPLES:
+  # Update global config
+  $ gun config
+
+  # Update local config
+  $ gun config --local
+```
 
