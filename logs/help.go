@@ -14,9 +14,11 @@ const aboutCommandDebug = "Run the configured debugger for the project";
 const aboutCommandTest  = "Run the test suite";
 const aboutCommandClean = "Remove build artifacts";
 const aboutCommandInit  = "Create a new project with templates, license, and structure";
+const aboutCommandHelp  = "Get information about any and all commands";
 const aboutCommandConfig   = "Edit or create a local project configuration file";
 const aboutCommandTemplate = "Manage project templates (add, create, list)";
 const aboutCommandLicense  = "Manage license files (create, replace, list)";
+const aboutCommandVersion  = "Get current gun version";
 
 const aboutFlagLocal    = "Edit the local config file instead of the global one"
 const aboutFlagGlobal   = "Run the command using the global config, overriding the local config";
@@ -105,6 +107,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 	lDullGreen := color.New( color.FgGreen ).SprintFunc();
 
 	var lAbout string;
+	var lAlias string;
 	var lFlags []printInfo;
 	var lExamples []printInfo;
 	var lParameters string = "[arguments] [flags]";
@@ -113,6 +116,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 	switch ( aCommand ) {
 		case "run":
 			lAbout = aboutCommandRun;
+			lAlias = "r";
 			lParameters = "[arguments]";
 			lExamples = []printInfo{{
 				about: "Run the last compiled Go program",
@@ -127,6 +131,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "build":
 			lAbout = aboutCommandBuild;
+			lAlias = "b";
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -143,6 +148,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "debug":
 			lAbout = aboutCommandDebug;
+			lAlias = "d";
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -156,6 +162,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "test":
 			lAbout = aboutCommandTest;
+			lAlias = "t";
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -169,6 +176,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "clean":
 			lAbout = aboutCommandClean;
+			lAlias = "c";
 			lFlags = []printInfo{
 				{ about: aboutFlagGlobal, command: "global" },
 			};
@@ -187,6 +195,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "init":
 			lAbout = aboutCommandInit;
+			lAlias = "i";
 			lFlags = []printInfo{
 				{ about: aboutFlagHere,        command: "here" },
 				{ about: aboutFlagNoGit,       command: "no-git" },
@@ -194,8 +203,14 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 				{ about: aboutFlagLicense,     command: "license [title]", },
 			};
 			lExamples = []printInfo{{
-				about: "",
-				command: "",
+				about: "Create a new C project titled FooBar",
+				command: "FooBar c",
+			},{
+				about: "Create a new python project titled HelloWorld in current working directory",
+				command: "HelloWorld py --here",
+			},{
+				about: "Create a new ESP32 project titled BlinkLED without any defined templates with GPLv2 license",
+				command: "BlinkLED esp --license GPLv2 --no-templates",
 			}};
 			lParameters = "<project name> <project language> [flags]";
 
@@ -211,10 +226,17 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 			lExamples = []printInfo{{
 				about: "",
 				command: "",
+			},{
+				about: "",
+				command: "",
+			},{
+				about: "",
+				command: "",
 			}};
 
 		case "config":
 			lAbout = aboutCommandConfig;
+			lAlias = "C";
 			lFlags = []printInfo{
 				{ about: aboutFlagLocal, command: "local" },
 			};
@@ -228,6 +250,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "license":
 			lAbout = aboutCommandLicense;
+			lAlias = "l";
 			lFlags = []printInfo{
 				{ about: aboutFlagList+"license",     command: "list" },
 				{ about: aboutFlagPrintDir, command: "print-dir" },
@@ -236,6 +259,32 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 			};
 			lExamples = []printInfo{{
 				about: "",
+				command: "",
+			},{
+				about: "",
+				command: "",
+			},{
+				about: "",
+				command: "",
+			}};
+
+		case "help":
+			lAbout = aboutCommandHelp;
+			lAlias = "h";
+			lParameters = "[command]";
+			lExamples = []printInfo{{
+				about: "Get general information of the program",
+				command: "",
+			},{
+				about: "Get all supported flags and usage of \"init\" subcommand",
+				command: "init",
+			}};
+
+		case "version":
+			lAbout = aboutCommandVersion;
+			lAlias = "v";
+			lExamples = []printInfo{{
+				about: "Get current version",
 				command: "",
 			}};
 
@@ -250,8 +299,10 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 	}
 
 	fmt.Println(
-		"\nUSAGE:",
-		lYellow( "\n  $" ), lRed( "gun" ), lGreen( aCommand ), lBlue( lParameters ),
+		"\nUSAGE:\n",
+		lYellow( " $" ), lRed( "gun" ), lGreen( aCommand ), lBlue( lParameters ),
+		"\n\nALIAS:\n ",
+		lRed( lAlias ),
 	);
 
 	if len( lFlags ) > 0 {

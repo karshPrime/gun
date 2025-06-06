@@ -32,6 +32,16 @@ FLAGS:
   --no-git           Create the project but not git repository
   --no-templates     Do not copy any config defined templates to the project
   --license [title]  Use the specified license for the project instead of the config defined
+
+EXAMPLES:
+  # Create a new C project titled FooBar
+  $ gun init FooBar c
+
+  # Create a new python project titled HelloWorld in current working directory
+  $ gun init HelloWorld py --here
+
+  # Create a new ESP32 project titled BlinkLED without any defined templates with GPLv2 license
+  $ gun init BlinkLED esp --license GPLv2 --no-templates
 ```
 
 ## Template
@@ -84,6 +94,15 @@ $ gun build [arguments] [flags]
 FLAGS:
   --global           Run the command using the global config, overriding the local config
 
+EXAMPLES:
+  # Build the Go project
+  $ gun build
+
+  # Build the Java project with `-g:none` parameters
+  $ gun build -g:none
+
+  # Build the C flag with default configs and with -Wextra -std=c11 parameters
+  $ gun build -Wextra -std=c11 --global
 ```
 
 ## Clean
@@ -136,7 +155,7 @@ EXAMPLES:
 ```
 
 ## Config
-Edit or create a local project configuration file
+Edit or create a local project configuration file.
 ```console
 $ gun config [arguments] [flags]
 
@@ -149,5 +168,24 @@ EXAMPLES:
 
   # Update local config
   $ gun config --local
+```
+
+## Help
+Get information about any and all commands.
+```console
+ $ gun help [command]
+
+EXAMPLES:
+  # Get general information of the program
+  $ gun help
+
+  # Get all supported flags and usage of "init" subcommand
+  $ gun help init
+```
+
+## Version
+Get current gun version.
+```console
+$ gun version
 ```
 

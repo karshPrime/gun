@@ -199,8 +199,6 @@ func ( configs *initConfigs ) parseConfigs( aProjectLanguage string ) bool {
 func replaceConfigPlaceholders( aString *string, aProjectName string, aProjectLang string ) {
 	lScriptPath := config.ConfigDir() + "scripts/";
 
-	logs.DebugPrint(  *aString,  aProjectName, aProjectLang );
-
 	*aString = strings.Replace( *aString, "%PROJECT_NAME%", aProjectName, -1 );
 	*aString = strings.Replace( *aString, "%PROJECT_LANGUAGE%", aProjectLang, -1 );
 	*aString = strings.Replace( *aString, "%SCRIPT% ", lScriptPath, -1 );
