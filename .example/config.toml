@@ -3,7 +3,7 @@
 
 [local]
 copy_config  = true
-config_title = "command"
+config_title = ".command"
 
 
 #- Default Configs ---------------------------------------------------------------------------------
