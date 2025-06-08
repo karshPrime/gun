@@ -153,7 +153,7 @@ func Copy( aSource string, aDestination string) ( fail bool ) {
 	// Check if the source is a directory
 	lSrcInfo, err := os.Stat( aSource )
 	if err != nil {
-		logs.ErrorPrint( "Failed to stat source %s: %w", aSource, err );
+		logs.ErrorPrint( err );
 		return true;
 	}
 

@@ -36,9 +36,9 @@ and run it the same way every time.
 - [x] Copy license file into project
 - [x] Copy template files into project
 - [x] **`init` command: Completed**
-- [ ] View/manage saved licenses
-- [ ] Replace current license
-- [ ] **License system: Completed**
+- [x] View/manage saved licenses
+- [x] Replace current license
+- [x] **License system: Completed**
 - [ ] View/manage saved templates
 - [ ] Create new template files
 - [ ] Add templates to projects

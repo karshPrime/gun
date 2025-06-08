@@ -68,6 +68,15 @@ FLAGS:
   --new [title]      Create a new license
   --replace [title]  Replace the current license with a new one
 
+EXAMPLES:
+  # Replace current project's license with GPLv2
+  $ gun license --replace GPLv2
+
+  # Add ./LICENSE to the record as Apache2 license
+  $ gun license --new ./LICENSE Apache2
+
+  # Add local ./MIT to the license record
+  $ gun license --new ./MIT
 ```
 
 ## Run

@@ -250,6 +250,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 
 		case "license":
 			lAbout = aboutCommandLicense;
+			lParameters = "[flags] [arguments]"
 			lAlias = "l";
 			lFlags = []printInfo{
 				{ about: aboutFlagList+"license",     command: "list" },
@@ -258,14 +259,14 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 				{ about: aboutFlagReplace,  command: "replace [title]"},
 			};
 			lExamples = []printInfo{{
-				about: "",
-				command: "",
+				about: "Replace current project's license with GPLv2",
+				command: "--replace GPLv2",
 			},{
-				about: "",
-				command: "",
+				about: "Add ./LICENSE to the record as Apache2 license",
+				command: "--new ./LICENSE Apache2",
 			},{
-				about: "",
-				command: "",
+				about: "Add local ./MIT to the license record",
+				command: "--new ./MIT",
 			}};
 
 		case "help":
@@ -302,7 +303,7 @@ func HelpCommand( aCommand string, aPrintAbout bool ) {
 		"\nUSAGE:\n",
 		lYellow( " $" ), lRed( "gun" ), lGreen( aCommand ), lBlue( lParameters ),
 		"\n\nALIAS:\n ",
-		lRed( lAlias ),
+		lYellow( " $" ), lRed( "gun" ), lGreen( lAlias ), lBlue( lParameters ),
 	);
 
 	if len( lFlags ) > 0 {
