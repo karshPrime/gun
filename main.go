@@ -38,10 +38,10 @@ func main() {
 
 		case "i", "init" : actions.Init();
 
-		case "T", "template" : templates.Template();
-		case "l", "license"  : licenses.License();
+		case "T", "template", "templates" : templates.Template();
+		case "l", "license" , "licenses"  : licenses.License();
 
-		case "h", "help", "--help", "-h"	   : logs.Help();
+		case "h", "help",    "--help",    "-h" : logs.Help();
 		case "v", "version", "--version", "-v" : fmt.Println( "Version:", VERSION );
 
 		default:
