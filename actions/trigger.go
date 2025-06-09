@@ -2,15 +2,15 @@
 
 package actions
 
-import ( 
+import (
 	"os"
 	"fmt"
 	"strings"
 	"path/filepath"
-	"karshPrime/gun/config"
 	"karshPrime/gun/logs"
+	"karshPrime/gun/config"
 	"github.com/pelletier/go-toml"
- )
+)
 
 //- Defines ----------------------------------------------------------------------------------------
 
@@ -72,6 +72,10 @@ func projectLanguage() string {
 	}
 
 	logs.ErrorPrint( "Unable to find project language" );
+	fmt.Println(
+		"Gun looks for main.* and app.* across the project file-structure to determine project"+ "language.\nCreate local command file to override this search.",
+	);
+	os.Exit(1); // exit the program if cant find project langauge
 	return "";
 }
 
@@ -83,6 +87,10 @@ func ( configs *triggerConfigs ) parseInput() {
 	}
 
 	lIsGlobal := func ( aIndex int ) bool {
+		if len( os.Args ) < aIndex {
+			return false;
+		}
+
 		return os.Args[aIndex] == "--global" || os.Args[aIndex] == "-g";
 	}
 
@@ -101,6 +109,10 @@ func ( configs *triggerConfigs ) parseInput() {
 
 func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger Triggers, aLanguage string ) bool {
 	logs.DebugPrint( "Global config parse" );
+
+	if len( aLanguage ) < 1 {
+		return false;
+	}
 
 	lTriggerKey := triggersKey( aTrigger );
 	configs.cdRoot = true;
@@ -135,11 +147,11 @@ func ( configs *triggerConfigs ) globalConfigParse( aTree *toml.Tree, aTrigger T
 	lLangKey := fmt.Sprintf( "dev.%s", strings.TrimPrefix( aLanguage, "." ));
 	switch (lReadGlobalConfig( lLangKey )) {
 		case 1:
-			logs.ErrorPrint( "Config not found for ", aLanguage[1:], "language/framework" );
+			logs.ErrorPrint( "Config not found for ", aLanguage, "language/framework" );
 			return false;
 
 		case 2:
-			logs.ErrorPrint( "Unable to parse global configs for ", aLanguage[1:],
+			logs.ErrorPrint( "Unable to parse global configs for ", aLanguage,
 				". Check Syntax." );
 			return false;
 
@@ -187,8 +199,10 @@ func ( configs *triggerConfigs ) parseConfigs( aTrigger Triggers, aLanguage ...s
 
 	var lProjectLanguage string;
 	if len( aLanguage ) == 0	 {
+		// when the function is called from trigger action itself
 		lProjectLanguage = projectLanguage();
 	} else  {
+		// when the function is called from build_print()
 		lProjectLanguage = "."+aLanguage[0];
 	}
 
